@@ -1,0 +1,139 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{fontspec}
+\usepackage{enumitem}
+\setmainfont{Montserrat}
+
+\setlength{\headheight}{40pt}
+\setlength{\headsep}{20pt}
+
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\fancyhead[R]{\includegraphics[height=1.5cm]{argo_space_logo.jpg}}
+
+\fancyfoot[C]{%
+  \footnotesize
+  \textcolor{blue}{ARGO SPACE CORP} \textcolor{gray}{| CONFIDENTIAL \& PROPRIETARY}
+}
+
+\fancyhead[L]{\textcolor{gray}{P a g e  |  }\thepage}
+
+\begin{document}
+    \doublespacing
+    \begin{titlepage}
+        \centering
+
+        \includegraphics[width=2in]{argo-space.jpg}
+
+        \vspace*{1.5cm}
+        \Huge
+        \textbf{Navigator Coupon Thermal Test Procedure}
+
+        \vfill
+
+        \includegraphics[width = 1.5in]{argo_space_logo.jpg}
+
+        \normalsize
+        \textcolor{gray}{Author: Jonathan Vollrath} \\
+        \textcolor{gray}{Runner: Jonathan Vollrath \& Chris Wordingham} \\
+        \textcolor{gray}{Reviewer: Ben Zabback \& Chris Wordingham} \\
+        \textcolor{gray}{Release Version: A} \\
+        \textcolor{gray}{Written: May 5, 2025} \\
+        \textcolor{gray}{Run: } \\
+        \textcolor{gray}{Duration: }
+    \end{titlepage}
+
+    \section*{Release Notes}
+
+        \begin{enumerate}[label=\Alph*.]
+            \item \textbf{Initial Release}
+            \begin{itemize}
+                \item Outline of procedure for review by Ben
+                \item Includes basic procedure for conducting thermal test of coupon
+            \end{itemize}
+        \end{enumerate}
+
+    \newpage
+
+    \section{Setup}
+        \begin{enumerate}
+            \item Gather thermocouple, flare fitting (blue), and tee-fitting (red) as shown below: \\
+            \begin{minipage}{0.45\textwidth}
+                \vspace*{1em}
+                \includegraphics[width=\textwidth]{thermocouple.jpeg}
+                \captionsetup{type=figure}
+                \caption{Thermocouple used in testing}
+            \end{minipage}
+            \hfill
+            \begin{minipage}{0.45\textwidth}
+                \vspace*{1em}
+                \includegraphics[width=0.75\textwidth, angle=90]{fluid_fittings.jpeg}
+                \captionsetup{type=figure}
+                \caption{figure}{Fittings used in testing}
+            \end{minipage}
+            \begin{itemize}
+                \item \textbf{Note:} The flare fitting (blue) needs to be machined to accept the thermocouple (1/8 inch)
+                \item Notes: 
+            \end{itemize}
+
+            \item The MET \textit{output} (the front one coming out of the top of the MET) is already fitted with a thermocouple, so you only need to "unplug" it and connected it to the output of the coupon
+            \begin{itemize}
+                \item Notes: 
+            \end{itemize}
+            \item The input does NOT have a thermocouple, and needs one
+            \begin{itemize}
+                \item Insert thermocouple into flare fitting, which has now been machined to accept it (all the way through)
+                \item Fit flare fitting into top of tee fitting, ensuring that thermocouple is deep enough into the flow to get good reading
+                \item Tighten nut on flare fitting to create water tight connection
+                \item Notes: 
+            \end{itemize}
+            \item To set up readings from thermocouples, ask Chris (fill in later)
+            \begin{itemize}
+                \item Notes: 
+            \end{itemize}
+            \item To set up water to flow at given temp and rate, ask Chris (fill in later)
+            \begin{itemize}
+                \item Notes: 
+            \end{itemize}
+            \item Final input assembly should look as follows: 
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=0.5\textwidth]{fitting_assembly.jpeg}
+                \caption{Input fitting assembly}
+            \end{figure}
+        \end{enumerate}
+
+    \section{Radiator Coupon Efficacy Test}
+        \begin{enumerate}
+            \item Yeah, Chris knows how to run the MET flow thingy, just ask him (fill in later)
+            \begin{itemize}
+                \item Notes: 
+            \end{itemize}
+            \item Be sure to achieve steady state behavior by running for at least 20 minutes
+            \begin{itemize}
+                \item Runtime: 
+                \item Notes: 
+            \end{itemize}
+        \end{enumerate}
+
+    \newpage
+
+    \section{Summary}
+
+    \appendix
+
+\end{document}
