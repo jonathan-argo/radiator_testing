@@ -32,10 +32,15 @@ int main() {
 
     panels::calcMomInert();
 
+    std::cout << "Root Moment of Inertia: " << panels::I_a << std::endl;
+    std::cout << "Panel Moment of Intertia: " << panels::I_b << std::endl;
 
+    panels::SystemMatrix system = panels::calcAccAndReac(panels::init);
 
-    panels::calcAccAndReac(panels::init);
+    // sol in format: ddtheta1, ddtheta2, ddtheta3, ddtheta4, ddtheta5, Re_1x, Re_1y, Re_2x, Re_2y, Re_3x, Re_3y, Re_4x, Re_4y, Re_5x, Re_5y
+    Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
 
+    std::cout << "Solution: \n" << sol << std::endl;
 
     return 0;
 }

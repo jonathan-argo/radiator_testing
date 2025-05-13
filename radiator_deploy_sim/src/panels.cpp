@@ -79,7 +79,7 @@ void panels::calcMomInert() {
     panels::I_e = 0.3333 * panels::mass5 * panels::width5 * panels::width5;
 }
 
-void panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta) {
+panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta) {
 
     Eigen::Matrix<double, 5, 1> theta = theta_dtheta.segment<5>(0);
     Eigen::Matrix<double, 5, 1> dtheta = theta_dtheta.segment<5>(5);
@@ -104,6 +104,7 @@ void panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta) {
     Eigen::Matrix<double, 15, 1> b;
     b.setZero();
 
+    // Sum Forces x
     for (int i = 0; i < 5; ++i) {
         A(i, i) = -m(i) * 0.5 * w(i) * std::sin(theta(i));
         if (i < 4) {
@@ -116,8 +117,9 @@ void panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta) {
         b(i) = m(i) * dtheta(i) * dtheta(i) * 0.5 * w(i) * std::cos(theta(i));
     }
 
+    // Sum Forces y
     for (int i = 0; i < 5; ++i) {
-        A(i + 5, i) = -m(i) * 0.5 * w(i) * std::sin(theta(i));
+        A(i + 5, i) = m(i) * 0.5 * w(i) * std::cos(theta(i));
         if (i < 4) {
             A(i + 5, (2 * i + 8)) = 1;
         }
@@ -125,13 +127,14 @@ void panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta) {
     }
 
     for (int i = 0; i < 5; ++i) {
-        b(i + 5) = m(i) * dtheta(i) * dtheta(i) * 0.5 * w(i) * std::cos(theta(i));
+        b(i + 5) = m(i) * dtheta(i) * dtheta(i) * 0.5 * w(i) * std::sin(theta(i));
     }
 
+    // Sum Moments
     A(10, 0) = I(0);
-    A(10, 8) = w(0) * std::cos(theta(1));
-    A(10, 7) = -w(0) * std::sin(theta(1)); 
-    b(10) = 4 * gen::pi * k(0) - 2 * gen::pi * k(1) + (4 * k(1) - 4 * k(0)) * theta(0);
+    A(10, 8) = w(0) * std::cos(theta(0));
+    A(10, 7) = -w(0) * std::sin(theta(0)); 
+    b(10) = 4 * gen::pi * k(0) - 2 * gen::pi * k(1) + (4 * k(1) - 4 * k(0)) * theta(0) - 4 * k(1) * theta(1);
 
     A(11, 1) = I(1);
     A(11, 10) = w(1) * std::cos(theta(1));
@@ -141,7 +144,7 @@ void panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta) {
     A(12, 2) = I(2);
     A(12, 12) = w(2) * std::cos(theta(2));
     A(12, 11) = -w(2) * std::sin(theta(2)); 
-    b(12) = -2 * gen::pi * k(2) - 2 * gen::pi * k(3) + (4 * k(2) + 4 * k(3)) * theta(2) + 4 * k(2) * theta(1) + 4 * k(3) * theta(3);
+    b(12) = -2 * gen::pi * k(2) - 2 * gen::pi * k(3) + (4 * k(2) + 4 * k(3)) * theta(2) - 4 * k(2) * theta(1) - 4 * k(3) * theta(3);
 
     A(13, 3) = I(3);
     A(13, 14) = w(3) * std::cos(theta(3));
@@ -152,5 +155,15 @@ void panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta) {
     b(14) = 4 * k(4) * theta(4) - 4 * k(4) * theta(3) - 2 * gen::pi * k(4);
 
     gen::checkSVD(A);
+
+    std::cout << "A: \n" << A << std::endl;
+    std::cout << "b: \n" << b << std::endl;
+
+    panels::SystemMatrix system;
+
+    system.A = A;
+    system.b = b;
+
+    return system;
     
 }

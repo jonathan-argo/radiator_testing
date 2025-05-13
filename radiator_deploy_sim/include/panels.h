@@ -31,32 +31,32 @@ namespace panels {
     // Panel 1 (root)
     constexpr double width1 = 0.385; // [m]
     constexpr double mass1 = 0.418; // [kg]
-    constexpr double theta_init1 = 0; // [rad]
-    constexpr double dtheta_init1 = 0; // [rad/s]
+    constexpr double theta_init1 = 1; //0; // [rad]
+    constexpr double dtheta_init1 = 1; // [rad/s]
 
     // Panel 2
     constexpr double width2 = 0.720; // [m]
     constexpr double mass2 = 0.782; // [kg]
-    constexpr double theta_init2 = gen::pi; // [rad]
-    constexpr double dtheta_init2 = 0; // [rad/s]
+    constexpr double theta_init2 = 2; //gen::pi; // [rad]
+    constexpr double dtheta_init2 = 2; // [rad/s]
 
     // Panel 3
     constexpr double width3 = 0.720; // [m]
     constexpr double mass3 = 0.782; // [kg]
-    constexpr double theta_init3 = 0; // [rad]
-    constexpr double dtheta_init3 = 0; // [rad/s]
+    constexpr double theta_init3 = 3; //0; // [rad]
+    constexpr double dtheta_init3 = 3; // [rad/s]
 
     // Panel 4
     constexpr double width4 = 0.720; // [m]
     constexpr double mass4 = 0.782; // [kg]
-    constexpr double theta_init4 = gen::pi; // [rad]
-    constexpr double dtheta_init4 = 0; // [rad/s]
+    constexpr double theta_init4 = 4; //gen::pi; // [rad]
+    constexpr double dtheta_init4 = 4; // [rad/s]
 
     // Panel 5
     constexpr double width5 = 0.720; // [m]
     constexpr double mass5 = 0.782; // [kg]
-    constexpr double theta_init5 = 0; // [rad]
-    constexpr double dtheta_init5 = 0; // [rad/s]
+    constexpr double theta_init5 = 5; //0; // [rad]
+    constexpr double dtheta_init5 = 5; // [rad/s]
 
     const Eigen::Matrix<double, 5, 1> theta_init = (Eigen::Matrix<double, 5, 1>() << 
                 theta_init1, theta_init2, theta_init3, theta_init4, theta_init5).finished();
@@ -67,11 +67,16 @@ namespace panels {
 
 
 
+    struct SystemMatrix {
+        Eigen::Matrix<double, 15, 15> A;
+        Eigen::Matrix<double, 15, 1> b;
+    };
+
 // Functions
 
     void calcDistances(const Eigen::Matrix<double, 5, 1>& theta);
     void calcMomInert();
-    void calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta);
+    SystemMatrix calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta);
     
 }
 
