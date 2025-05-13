@@ -3,22 +3,22 @@
 
 #include "gen.h"
 #include <vector> 
-
+#include <Eigen/Dense>
 
 namespace panels {
 
 // Variables (changeable)
 
-    inline std::vector<double> r_1;
-    inline std::vector<double> r_2;
-    inline std::vector<double> r_3;
-    inline std::vector<double> r_4;
-    inline std::vector<double> r_5;
-    inline std::vector<double> r_a;
-    inline std::vector<double> r_b;
-    inline std::vector<double> r_c; 
-    inline std::vector<double> r_d;
-    inline std::vector<double> r_e;
+    inline Eigen::Vector3d r_1;
+    inline Eigen::Vector3d r_2;
+    inline Eigen::Vector3d r_3;
+    inline Eigen::Vector3d r_4;
+    inline Eigen::Vector3d r_5;
+    inline Eigen::Vector3d r_a;
+    inline Eigen::Vector3d r_b;
+    inline Eigen::Vector3d r_c; 
+    inline Eigen::Vector3d r_d;
+    inline Eigen::Vector3d r_e;
 
     inline double I_a;
     inline double I_b;
@@ -32,34 +32,46 @@ namespace panels {
     constexpr double width1 = 0.385; // [m]
     constexpr double mass1 = 0.418; // [kg]
     constexpr double theta_init1 = 0; // [rad]
+    constexpr double dtheta_init1 = 0; // [rad/s]
 
     // Panel 2
     constexpr double width2 = 0.720; // [m]
     constexpr double mass2 = 0.782; // [kg]
     constexpr double theta_init2 = gen::pi; // [rad]
+    constexpr double dtheta_init2 = 0; // [rad/s]
 
     // Panel 3
     constexpr double width3 = 0.720; // [m]
     constexpr double mass3 = 0.782; // [kg]
     constexpr double theta_init3 = 0; // [rad]
+    constexpr double dtheta_init3 = 0; // [rad/s]
 
     // Panel 4
     constexpr double width4 = 0.720; // [m]
     constexpr double mass4 = 0.782; // [kg]
     constexpr double theta_init4 = gen::pi; // [rad]
+    constexpr double dtheta_init4 = 0; // [rad/s]
 
     // Panel 5
     constexpr double width5 = 0.720; // [m]
     constexpr double mass5 = 0.782; // [kg]
     constexpr double theta_init5 = 0; // [rad]
+    constexpr double dtheta_init5 = 0; // [rad/s]
 
-    static const std::vector<double> theta_init = {theta_init1, theta_init2, theta_init3, theta_init4, theta_init5};
+    const Eigen::Matrix<double, 5, 1> theta_init = (Eigen::Matrix<double, 5, 1>() << 
+                theta_init1, theta_init2, theta_init3, theta_init4, theta_init5).finished();
+
+    const Eigen::Matrix<double, 10, 1> init = (Eigen::Matrix<double, 10, 1>() << 
+                theta_init1, theta_init2, theta_init3, theta_init4, theta_init5, 
+                dtheta_init1, dtheta_init2, dtheta_init3, dtheta_init4, dtheta_init5).finished();
+
+
 
 // Functions
 
-    void calcDistances(const std::vector<double>& theta);
+    void calcDistances(const Eigen::Matrix<double, 5, 1>& theta);
     void calcMomInert();
-    int calcResidual(N_Vector y, N_Vector f, void *user_data);
+    void calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta);
     
 }
 

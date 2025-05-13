@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/jonathanvollrath/libraries/sundials/sundials/install/lib/cmake/sundials/include -I/home/jonathanvollrath/radiator_testing/radiator_deploy_sim/include -isystem /home/jonathanvollrath/libraries/sundials/sundials/install/include
+CXX_INCLUDES = -I/home/jonathanvollrath/radiator_testing/radiator_deploy_sim/include -isystem /usr/include/eigen3
 
 CXX_FLAGS = -std=gnu++17
 

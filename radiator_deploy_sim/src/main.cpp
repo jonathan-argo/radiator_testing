@@ -1,6 +1,7 @@
 #include "panels.h"
 #include "hinges.h"
 
+#include <Eigen/Dense>
 #include <iostream>
 #include <cmath>
 
@@ -29,15 +30,11 @@ int main() {
     std::cout << "r_e: \n" << panels::r_e << std::endl; 
     */
 
-
-    std::cout << "KINSOL version: " << SUNDIALS_VERSION_MAJOR << "." 
-              << SUNDIALS_VERSION_MINOR << "." 
-              << SUNDIALS_VERSION_PATCH << std::endl;
-
-
     panels::calcMomInert();
 
 
+
+    panels::calcAccAndReac(panels::init);
 
 
     return 0;

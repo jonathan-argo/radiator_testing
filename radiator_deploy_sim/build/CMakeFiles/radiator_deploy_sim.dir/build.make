@@ -124,8 +124,6 @@ radiator_deploy_sim: CMakeFiles/radiator_deploy_sim.dir/src/gen.cpp.o
 radiator_deploy_sim: CMakeFiles/radiator_deploy_sim.dir/src/main.cpp.o
 radiator_deploy_sim: CMakeFiles/radiator_deploy_sim.dir/src/panels.cpp.o
 radiator_deploy_sim: CMakeFiles/radiator_deploy_sim.dir/build.make
-radiator_deploy_sim: /home/jonathanvollrath/libraries/sundials/sundials/install/lib/libsundials_kinsol.so.7.3.0
-radiator_deploy_sim: /home/jonathanvollrath/libraries/sundials/sundials/install/lib/libsundials_core.so.7.3.0
 radiator_deploy_sim: CMakeFiles/radiator_deploy_sim.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/jonathanvollrath/radiator_testing/radiator_deploy_sim/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable radiator_deploy_sim"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/radiator_deploy_sim.dir/link.txt --verbose=$(VERBOSE)
