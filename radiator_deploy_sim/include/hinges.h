@@ -8,8 +8,8 @@ namespace hinges {
     inline double k_d;
     inline double k_e;
 
-    constexpr double b_damp = 0.5;
-    constexpr double mu_friction = 0.01;
+    constexpr double b_damp = 100.0;
+    constexpr double mu_friction = 0.05;
 }
 
 #endif // HINGES_H

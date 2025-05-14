@@ -78,7 +78,7 @@ void panels::calcMomInert() {
     panels::I_e = 0.3333 * panels::mass5 * panels::width5 * panels::width5;
 }
 
-panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta) {
+panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta, panels::forceSumCoef& forceSumCoef) {
 
     Eigen::Matrix<double, 5, 1> theta = theta_dtheta.segment<5>(0);
     Eigen::Matrix<double, 5, 1> dtheta = theta_dtheta.segment<5>(5);
@@ -105,7 +105,9 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
 
     // Sum Forces x
     for (int i = 0; i < 5; ++i) {
-        A(i, i) = -m(i) * 0.5 * w(i) * std::sin(theta(i));
+        for (int j = 0; j <= i; ++j) {
+            A(i, j) = m(i) * forceSumCoef.accCoefX(i, j);
+        }
         if (i < 4) {
             A(i, (2 * i + 7)) = 1;
         }
@@ -113,12 +115,14 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     }
 
     for (int i = 0; i < 5; ++i) {
-        b(i) = m(i) * dtheta(i) * dtheta(i) * 0.5 * w(i) * std::cos(theta(i));
+        b(i) = m(i) * forceSumCoef.constTermX(i);
     }
 
     // Sum Forces y
     for (int i = 0; i < 5; ++i) {
-        A(i + 5, i) = m(i) * 0.5 * w(i) * std::cos(theta(i));
+        for (int j = 0; j <= i; ++j) {
+            A(i + 5, j) = m(i) * forceSumCoef.accCoefY(i, j);
+        }
         if (i < 4) {
             A(i + 5, (2 * i + 8)) = 1;
         }
@@ -126,7 +130,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     }
 
     for (int i = 0; i < 5; ++i) {
-        b(i + 5) = m(i) * dtheta(i) * dtheta(i) * 0.5 * w(i) * std::sin(theta(i));
+        b(i + 5) = m(i) * forceSumCoef.constTermY(i);
     }
 
     // Sum Moments
@@ -153,17 +157,17 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     A(14, 4) = I(4); 
     b(14) = 4 * k(4) * theta(4) - 4 * k(4) * theta(3) - 2 * gen::pi * k(4);
 
+    // Replace conditional friction with continuous friction model for all angles
     for (int i = 0; i < 5; ++i) {
-        if (std::abs(dtheta(i)) > 0.01) {
-            b(10 + i) += -hinges::mu_friction * dtheta(i);
-        }
+        // Use tanh for smooth transition of friction around zero velocity
+        b(10 + i) += -hinges::mu_friction * tanh(100 * dtheta(i));
     }
 
     for (int i = 0; i < 5; ++i) {
         b(10 + i) += -hinges::b_damp * dtheta(i);
     }
 
-    /*
+    // Mechanical stops to prevent over-rotation
     if (theta(0) > panels::theta_max1) {
         b(10) += -gen::k_stop * (theta(0) - panels::theta_max1);
     } 
@@ -183,7 +187,6 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     if ((theta(3) - theta(4)) < 0) {
         b(14) += gen::k_stop * (theta(3) - theta(4));
     }
-    */
 
     gen::checkSVD(A);
 
@@ -241,3 +244,50 @@ const Eigen::Matrix<double, 10, 1> panels::semiImplicitEuler(const Eigen::Matrix
     return theta_dtheta_n_1;
 }
 
+panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 10, 1>& state) {
+    Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+    Eigen::Matrix<double, 5, 1> dtheta = state.segment<5>(5);
+
+    Eigen::Matrix<double, 5, 1> w;
+    w << panels::width1, panels::width2, panels::width3, panels::width4, panels::width5;
+
+    Eigen::Matrix<double, 5, 1> m;
+    m << panels::mass1, panels::mass2, panels::mass3, panels::mass4, panels::mass5;
+
+    panels::forceSumCoef forceSumCoef;
+
+    double acc_coef_x = 0.5 * panels::width1 * (-std::sin(theta(0)));
+    double curr_const_term_x = - 0.5 * panels::width1 * dtheta(0) * std::cos(theta(0));
+
+    double acc_coef_y = 0.5 * panels::width1 * (std::cos(theta(0)));
+    double curr_const_term_y = - 0.5 * panels::width1 * dtheta(0) * std::sin(theta(0));
+
+    forceSumCoef.accCoefX(0, 0) = acc_coef_x;
+    forceSumCoef.accCoefY(0, 0) = acc_coef_y;
+    forceSumCoef.constTermX(0)  = curr_const_term_x;
+    forceSumCoef.constTermY(0) = curr_const_term_y;
+
+    double prev_const_x = curr_const_term_x;
+    double prev_const_y = curr_const_term_y;
+
+    for (int i = 1; i < 5; ++i) {
+        forceSumCoef.accCoefX.col(i) = forceSumCoef.accCoefX.col(i - 1);
+        forceSumCoef.accCoefX(i, i - 1) = 2 * forceSumCoef.accCoefX(i, i - 1);
+        forceSumCoef.accCoefX(i, i) = 0.5 * w(i) * (-std::sin(theta(i)));
+
+        forceSumCoef.accCoefY.col(i) = forceSumCoef.accCoefX.col(i - 1);
+        forceSumCoef.accCoefY(i, i - 1) = 2 * forceSumCoef.accCoefY(i, i - 1);
+        forceSumCoef.accCoefY(i, i) = 0.5 * w(i) * (std::cos(theta(i)));
+
+        curr_const_term_x = - 0.5 * w(i) * dtheta(i) * std::cos(theta(i));
+        forceSumCoef.constTermX(i) = forceSumCoef.constTermX(i - 1) + prev_const_x + curr_const_term_x;
+        prev_const_x = curr_const_term_x;
+
+        curr_const_term_y = - 0.5 * w(i) * dtheta(i) * std::sin(theta(i));
+        forceSumCoef.constTermY(i) = forceSumCoef.constTermY(i - 1) + prev_const_y + curr_const_term_y;
+        prev_const_y = curr_const_term_y;
+    }
+
+    return forceSumCoef;
+
+}

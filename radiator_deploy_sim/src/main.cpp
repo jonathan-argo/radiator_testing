@@ -5,10 +5,22 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <limits>
+#include <algorithm> // For std::clamp
+
+// Function to check if a value is valid (not NaN or Inf)
+bool isValidState(const Eigen::Matrix<double, 10, 1>& state) {
+    for (int i = 0; i < state.size(); ++i) {
+        if (std::isnan(state(i)) || std::isinf(state(i))) {
+            return false;
+        }
+    }
+    return true;
+}
 
 int main() {
 
-    std::ofstream file("../state_sol.csv");
+    std::ofstream file("../data/state_sol.csv");
     if (!file.is_open()) {
         std::cerr << "Failed to open the file." << std::endl;
         return 1;
@@ -17,11 +29,12 @@ int main() {
     file << "theta1,theta2,theta3,theta4,theta5,dtheta1,dtheta2,dtheta3,dtheta4,dtheta5,";
     file << "ddtheta1,ddtheta2,ddtheta3,ddtheta4,ddtheta5,Re_1x,Re_1y,Re_2x,Re_2y,Re_3x,Re_3y,Re_4x,Re_4y,Re_5x,Re_5y\n";
 
-    hinges::k_a = 0.02;
-    hinges::k_b = 0.02;
-    hinges::k_c = 0.02;
-    hinges::k_d = 0.02;
-    hinges::k_e = 0.02;
+    // Increased spring constants for better stability
+    hinges::k_a = 5.0;
+    hinges::k_b = 5.0;
+    hinges::k_c = 5.0;
+    hinges::k_d = 5.0;
+    hinges::k_e = 5.0;
 
     panels::calcDistances(panels::theta_init);
 
@@ -60,10 +73,20 @@ int main() {
         panels::dtheta_init5
     };
 
-    panels::SystemMatrix system = panels::calcAccAndReac(state);
+    panels::forceSumCoef forceSumCoef;
+    forceSumCoef = panels::calcAccCoef(state);
+
+    panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
 
     // sol in format: ddtheta1, ddtheta2, ddtheta3, ddtheta4, ddtheta5, Re_1x, Re_1y, Re_2x, Re_2y, Re_3x, Re_3y, Re_4x, Re_4y, Re_5x, Re_5y
     Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+
+    // System Matrices Debugging
+    //*
+    std::cout << "A: \n" << system.A << std::endl;
+    std::cout << "b: \n" << system.b << std::endl;
+    std::cout << "Solution: \n" << sol << std::endl;
+    //*/
 
     Eigen::Matrix<double, 5, 4> acceleration_buffer;
 
@@ -87,10 +110,25 @@ int main() {
     acceleration_buffer.col(0) = ddtheta_n;
 
     for (int i = 0; i < 3; ++i) {
-        std::cout << "Acceleration Buffer: \n" << acceleration_buffer << std::endl;
+        // std::cout << "Acceleration Buffer: \n" << acceleration_buffer << std::endl;
         state = panels::semiImplicitEuler(ddtheta_n, state);
-        panels::SystemMatrix system = panels::calcAccAndReac(state);
+        
+        // Check for numerical instability in initial steps
+        if (!isValidState(state)) {
+            std::cerr << "Numerical instability detected in initial Euler step " << i << std::endl;
+            std::cerr << "Current state: " << state.transpose() << std::endl;
+            return 1; // Exit early if instability is detected
+        }
+        
+        forceSumCoef = panels::calcAccCoef(state);
+        panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
         Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+
+        // Check solution quality
+        double relative_error = (system.A * sol - system.b).norm() / system.b.norm();
+        if (relative_error > 1e-6) {
+            std::cerr << "Warning: Large relative error in initial system solution: " << relative_error << std::endl;
+        }
 
         ddtheta_n << sol.segment<5>(0);
         for (int col = 3; col > 0; --col) {
@@ -112,13 +150,37 @@ int main() {
         file << "\n";
     }
 
-    std::cout << "Acceleration Buffer: \n" << acceleration_buffer << std::endl;
+    // std::cout << "Acceleration Buffer: \n" << acceleration_buffer << std::endl;
 
     double num_iter = gen::num_iter;
     for (int i = 0; i < num_iter - 3; ++i) {
         state = panels::rk4(acceleration_buffer, state);
-        panels::SystemMatrix system = panels::calcAccAndReac(state);
+        
+        // Check for numerical instability
+        if (!isValidState(state)) {
+            std::cerr << "Numerical instability detected at iteration " << i << std::endl;
+            std::cerr << "Current state: " << state.transpose() << std::endl;
+            break;
+        }
+        
+        // Add bounds checking on angles (optional safety)
+        for (int j = 0; j < 5; ++j) {
+            // If angles exceed reasonable bounds, clamp them
+            if (std::abs(state(j)) > 10.0) {
+                std::cerr << "Warning: Clamping theta[" << j << "] from " << state(j) << " to bounds" << std::endl;
+                state(j) = std::clamp(state(j), -10.0, 10.0);
+            }
+        }
+        
+        forceSumCoef = panels::calcAccCoef(state);
+        panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
         Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+
+        // Check if solution is valid
+        double relative_error = (system.A * sol - system.b).norm() / system.b.norm();
+        if (relative_error > 1e-6) {
+            std::cerr << "Warning: Large relative error in system solution: " << relative_error << std::endl;
+        }
 
         ddtheta_n << sol.segment<5>(0);
         for (int col = 3; col > 0; --col) {
@@ -139,14 +201,6 @@ int main() {
         }
         file << "\n";
     }
-
-
-    // System Matrices Debugging
-    /*
-    std::cout << "A: \n" << system.A << std::endl;
-    std::cout << "b: \n" << system.b << std::endl;
-    std::cout << "Solution: \n" << sol << std::endl;
-    */
 
     file.close();
 
