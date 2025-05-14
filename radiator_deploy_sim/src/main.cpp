@@ -17,11 +17,11 @@ int main() {
     file << "theta1,theta2,theta3,theta4,theta5,dtheta1,dtheta2,dtheta3,dtheta4,dtheta5,";
     file << "ddtheta1,ddtheta2,ddtheta3,ddtheta4,ddtheta5,Re_1x,Re_1y,Re_2x,Re_2y,Re_3x,Re_3y,Re_4x,Re_4y,Re_5x,Re_5y\n";
 
-    hinges::k_a = 0.05;
-    hinges::k_b = 0.04;
-    hinges::k_c = 0.03;
+    hinges::k_a = 0.02;
+    hinges::k_b = 0.02;
+    hinges::k_c = 0.02;
     hinges::k_d = 0.02;
-    hinges::k_e = 0.01;
+    hinges::k_e = 0.02;
 
     panels::calcDistances(panels::theta_init);
 
@@ -148,7 +148,7 @@ int main() {
     std::cout << "Solution: \n" << sol << std::endl;
     */
 
-    
+    file.close();
 
     return 0;
 }

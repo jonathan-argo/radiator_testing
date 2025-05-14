@@ -153,6 +153,38 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     A(14, 4) = I(4); 
     b(14) = 4 * k(4) * theta(4) - 4 * k(4) * theta(3) - 2 * gen::pi * k(4);
 
+    for (int i = 0; i < 5; ++i) {
+        if (std::abs(dtheta(i)) > 0.01) {
+            b(10 + i) += -hinges::mu_friction * dtheta(i);
+        }
+    }
+
+    for (int i = 0; i < 5; ++i) {
+        b(10 + i) += -hinges::b_damp * dtheta(i);
+    }
+
+    /*
+    if (theta(0) > panels::theta_max1) {
+        b(10) += -gen::k_stop * (theta(0) - panels::theta_max1);
+    } 
+
+    if ((theta(1) - theta(0)) < 0) {
+        b(11) += gen::k_stop * (theta(1) - theta(0));
+    }
+
+    if ((theta(1) - theta(2)) < 0) {
+        b(12) += gen::k_stop * (theta(1) - theta(2));
+    }
+
+    if ((theta(3) - theta(2)) < 0) {
+        b(13) += gen::k_stop * (theta(3) - theta(2));
+    }
+
+    if ((theta(3) - theta(4)) < 0) {
+        b(14) += gen::k_stop * (theta(3) - theta(4));
+    }
+    */
+
     gen::checkSVD(A);
 
     panels::SystemMatrix system;

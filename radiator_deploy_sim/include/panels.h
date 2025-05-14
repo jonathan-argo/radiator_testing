@@ -33,6 +33,7 @@ namespace panels {
     constexpr double mass1 = 0.418; // [kg]
     constexpr double theta_init1 = 0; // [rad]
     constexpr double dtheta_init1 = 0; // [rad/s]
+    constexpr double theta_max1 = gen::pi / 2; // [rad]
 
     // Panel 2
     constexpr double width2 = 0.720; // [m]

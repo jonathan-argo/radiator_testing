@@ -7,3 +7,4 @@
 *.xlsx
 radiator_deploy_sim/build/*
 !radiator_deploy_sim/build/.gitkeep
+*.csv
