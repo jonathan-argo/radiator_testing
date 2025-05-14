@@ -70,7 +70,6 @@ void panels::calcDistances(const Eigen::Matrix<double, 5, 1>& theta) {
     };
 }
 
-
 void panels::calcMomInert() {
     panels::I_a = 0.3333 * panels::mass1 * panels::width1 * panels::width1;
     panels::I_b = 0.3333 * panels::mass2 * panels::width2 * panels::width2;
@@ -156,9 +155,6 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
 
     gen::checkSVD(A);
 
-    std::cout << "A: \n" << A << std::endl;
-    std::cout << "b: \n" << b << std::endl;
-
     panels::SystemMatrix system;
 
     system.A = A;
@@ -167,3 +163,49 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     return system;
     
 }
+
+const Eigen::Matrix<double, 10, 1> panels::rk4(const Eigen::Matrix<double, 5, 4>& acceleration_buffer, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n) {
+    Eigen::Matrix<double, 10, 1> state_n_1;
+    double dt = gen::time_step;
+    
+    Eigen::Matrix<double, 5, 1> theta = theta_dtheta_n.segment<5>(0);
+    Eigen::Matrix<double, 5, 1> dtheta = theta_dtheta_n.segment<5>(5);
+
+    Eigen::Matrix<double, 5, 1> k1, k2, k3, k4;
+    Eigen::Matrix<double, 5, 1> l1, l2, l3, l4;
+
+    for (int i = 0; i < 5; ++i) {
+        k1(i) = dt * dtheta(i);
+        l1(i) = dt * acceleration_buffer(i, 0);
+        k2(i) = dt * (dtheta(i) + 0.5 * l1(i));
+        l2(i) = dt * acceleration_buffer(i, 1);
+        k3(i) = dt * (dtheta(i) + 0.5 * l2(i));
+        l3(i) = dt * acceleration_buffer(i, 2);
+        k4(i) = dt * (dtheta(i) + l3(i));
+        l4(i) = dt * acceleration_buffer(i, 3);
+    }
+
+    for (int i = 0; i < 5; ++i) {
+        state_n_1(i) = theta(i) + 0.16667 * (k1(i) + 2 * k2(i) + 2 * k3(i) + k4(i));
+        state_n_1(i + 5) = dtheta(i) + 0.16667 * (l1(i) + 2 * l2(i) + 2 * l3(i) + l4(i));
+    }
+
+    return state_n_1;
+
+}
+
+const Eigen::Matrix<double, 10, 1> panels::semiImplicitEuler(const Eigen::Matrix<double, 5, 1>& ddtheta_n, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n) {
+    Eigen::Matrix<double, 5, 1> theta = theta_dtheta_n.segment<5>(0);
+    Eigen::Matrix<double, 5, 1> dtheta = theta_dtheta_n.segment<5>(5);
+    double dt = gen::time_step;
+
+    Eigen::Matrix<double, 10, 1> theta_dtheta_n_1;
+
+    for (int i = 0; i < 5; ++i) {
+        theta_dtheta_n_1(i + 5) = dtheta(i) + dt * ddtheta_n(i);
+        theta_dtheta_n_1(i) = theta(i) + dt * theta_dtheta_n_1(i + 5);
+    }
+
+    return theta_dtheta_n_1;
+}
+
