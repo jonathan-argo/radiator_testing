@@ -6,7 +6,7 @@
 
 namespace gen {
     constexpr double pi = 3.14159265359;
-    constexpr double time_step = 0.0001;
+    constexpr double time_step = 0.01;
     constexpr double num_iter = 100000;
     constexpr double k_stop = 1000.0;
 

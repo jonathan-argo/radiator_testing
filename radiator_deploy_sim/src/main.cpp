@@ -30,11 +30,11 @@ int main() {
     file << "ddtheta1,ddtheta2,ddtheta3,ddtheta4,ddtheta5,Re_1x,Re_1y,Re_2x,Re_2y,Re_3x,Re_3y,Re_4x,Re_4y,Re_5x,Re_5y\n";
 
     // Increased spring constants for better stability
-    hinges::k_a = 5.0;
-    hinges::k_b = 5.0;
-    hinges::k_c = 5.0;
-    hinges::k_d = 5.0;
-    hinges::k_e = 5.0;
+    hinges::k_a = 0.05;
+    hinges::k_b = 0.04;
+    hinges::k_c = 0.03;
+    hinges::k_d = 0.02;
+    hinges::k_e = 0.01;
 
     panels::calcDistances(panels::theta_init);
 
@@ -75,6 +75,11 @@ int main() {
 
     panels::forceSumCoef forceSumCoef;
     forceSumCoef = panels::calcAccCoef(state);
+
+    //*
+    std::cout << "Acceleration Coefficients X: \n" << forceSumCoef.accCoefX << std::endl;
+    std::cout << "Acceleration Coefficients Y: \n" << forceSumCoef.accCoefY << std::endl;
+    //*/
 
     panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
 
@@ -167,7 +172,7 @@ int main() {
         for (int j = 0; j < 5; ++j) {
             // If angles exceed reasonable bounds, clamp them
             if (std::abs(state(j)) > 10.0) {
-                std::cerr << "Warning: Clamping theta[" << j << "] from " << state(j) << " to bounds" << std::endl;
+                // std::cerr << "Warning: Clamping theta[" << j << "] from " << state(j) << " to bounds" << std::endl;
                 state(j) = std::clamp(state(j), -10.0, 10.0);
             }
         }

@@ -106,7 +106,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     // Sum Forces x
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j <= i; ++j) {
-            A(i, j) = m(i) * forceSumCoef.accCoefX(i, j);
+            A(i, j) = m(j) * forceSumCoef.accCoefX(i, j);
         }
         if (i < 4) {
             A(i, (2 * i + 7)) = 1;
@@ -121,7 +121,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     // Sum Forces y
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j <= i; ++j) {
-            A(i + 5, j) = m(i) * forceSumCoef.accCoefY(i, j);
+            A(i + 5, j) = m(j) * forceSumCoef.accCoefY(i, j);
         }
         if (i < 4) {
             A(i + 5, (2 * i + 8)) = 1;
@@ -134,28 +134,28 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     }
 
     // Sum Moments
-    A(10, 0) = I(0);
-    A(10, 8) = w(0) * std::cos(theta(0));
-    A(10, 7) = -w(0) * std::sin(theta(0)); 
-    b(10) = 4 * gen::pi * k(0) - 2 * gen::pi * k(1) + (4 * k(1) - 4 * k(0)) * theta(0) - 4 * k(1) * theta(1);
+    A(10, 0) = I(0); // this is good
+    A(10, 8) = w(0) * std::cos(theta(0)); // this is good
+    A(10, 7) = -w(0) * std::sin(theta(0)); // this is good
+    b(10) = 4 * k(0) * (gen::pi - theta(0)) + 4 * k(1) * (0.5 * gen::pi - theta(0) + theta(1)); // this is good
 
-    A(11, 1) = I(1);
-    A(11, 10) = w(1) * std::cos(theta(1));
-    A(11, 9) = -w(1) * std::sin(theta(1)); 
-    b(11) = 2 * gen::pi * k(1) + 2 * gen::pi * k(2) + (4 * k(1) + 4 * k(2)) * theta(1) - 4 * k(1) * theta(0) - 4 * k(2) * theta(2);
+    A(11, 1) = I(1); // this is good
+    A(11, 10) = w(1) * std::cos(theta(1)); // this is good
+    A(11, 9) = -w(1) * std::sin(theta(1)); // this is good
+    b(11) = -4 * k(1) * (0.5 * gen::pi - theta(0) + theta(1)) - 4 * k(2) * (0.5 * gen::pi + theta(1) - theta(2)); // this is good
 
-    A(12, 2) = I(2);
-    A(12, 12) = w(2) * std::cos(theta(2));
-    A(12, 11) = -w(2) * std::sin(theta(2)); 
-    b(12) = -2 * gen::pi * k(2) - 2 * gen::pi * k(3) + (4 * k(2) + 4 * k(3)) * theta(2) - 4 * k(2) * theta(1) - 4 * k(3) * theta(3);
+    A(12, 2) = I(2); // this is good
+    A(12, 12) = w(2) * std::cos(theta(2)); // this is good
+    A(12, 11) = -w(2) * std::sin(theta(2)); // this is good
+    b(12) = 4 * k(2) * (0.5 * gen::pi + theta(1) - theta(2)) + 4 * k(3) * (0.5 * gen::pi - theta(2) + theta(3)); // this is good
 
-    A(13, 3) = I(3);
-    A(13, 14) = w(3) * std::cos(theta(3));
-    A(13, 13) = -w(3) * std::sin(theta(3)); 
-    b(13) = 2 * gen::pi * k(3) + 2 * gen::pi * k(4) + (4 * k(3) + 4 * k(4)) * theta(3) - 4 * k(3) * theta(2) - 4 * k(4) * theta(4);
+    A(13, 3) = I(3); // this is good
+    A(13, 14) = w(3) * std::cos(theta(3)); // this is good
+    A(13, 13) = -w(3) * std::sin(theta(3)); // this is good
+    b(13) = -4 * k(3) * (0.5 * gen::pi - theta(2) + theta(3)) - 4 * k(4) * (0.5 * gen::pi + theta(3) - theta(4)); // this is good
 
-    A(14, 4) = I(4); 
-    b(14) = 4 * k(4) * theta(4) - 4 * k(4) * theta(3) - 2 * gen::pi * k(4);
+    A(14, 4) = I(4); // this is good
+    b(14) = 4 * k(4) * (0.5 * gen::pi + theta(3) - theta(4)); 
 
     // Replace conditional friction with continuous friction model for all angles
     for (int i = 0; i < 5; ++i) {
@@ -168,6 +168,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     }
 
     // Mechanical stops to prevent over-rotation
+    /*
     if (theta(0) > panels::theta_max1) {
         b(10) += -gen::k_stop * (theta(0) - panels::theta_max1);
     } 
@@ -187,6 +188,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     if ((theta(3) - theta(4)) < 0) {
         b(14) += gen::k_stop * (theta(3) - theta(4));
     }
+    */
 
     gen::checkSVD(A);
 
@@ -255,12 +257,16 @@ panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 10, 1>& sta
     m << panels::mass1, panels::mass2, panels::mass3, panels::mass4, panels::mass5;
 
     panels::forceSumCoef forceSumCoef;
+    forceSumCoef.accCoefX.setZero();
+    forceSumCoef.accCoefY.setZero();
+    forceSumCoef.constTermX.setZero();
+    forceSumCoef.constTermY.setZero();
 
     double acc_coef_x = 0.5 * panels::width1 * (-std::sin(theta(0)));
-    double curr_const_term_x = - 0.5 * panels::width1 * dtheta(0) * std::cos(theta(0));
+    double curr_const_term_x = 0.5 * panels::width1 * dtheta(0) * dtheta(0) * std::cos(theta(0));
 
     double acc_coef_y = 0.5 * panels::width1 * (std::cos(theta(0)));
-    double curr_const_term_y = - 0.5 * panels::width1 * dtheta(0) * std::sin(theta(0));
+    double curr_const_term_y = 0.5 * panels::width1 * dtheta(0) * dtheta(0) * std::sin(theta(0));
 
     forceSumCoef.accCoefX(0, 0) = acc_coef_x;
     forceSumCoef.accCoefY(0, 0) = acc_coef_y;
@@ -271,19 +277,19 @@ panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 10, 1>& sta
     double prev_const_y = curr_const_term_y;
 
     for (int i = 1; i < 5; ++i) {
-        forceSumCoef.accCoefX.col(i) = forceSumCoef.accCoefX.col(i - 1);
+        forceSumCoef.accCoefX.row(i) = forceSumCoef.accCoefX.row(i - 1);
         forceSumCoef.accCoefX(i, i - 1) = 2 * forceSumCoef.accCoefX(i, i - 1);
-        forceSumCoef.accCoefX(i, i) = 0.5 * w(i) * (-std::sin(theta(i)));
+        forceSumCoef.accCoefX(i, i) = 0.5 * w(i) * (-std::sin(theta(i))); // yeah these are correct
 
-        forceSumCoef.accCoefY.col(i) = forceSumCoef.accCoefX.col(i - 1);
+        forceSumCoef.accCoefY.row(i) = forceSumCoef.accCoefY.row(i - 1);
         forceSumCoef.accCoefY(i, i - 1) = 2 * forceSumCoef.accCoefY(i, i - 1);
         forceSumCoef.accCoefY(i, i) = 0.5 * w(i) * (std::cos(theta(i)));
 
-        curr_const_term_x = - 0.5 * w(i) * dtheta(i) * std::cos(theta(i));
+        curr_const_term_x = 0.5 * w(i) * dtheta(i) * dtheta(i) * std::cos(theta(i));
         forceSumCoef.constTermX(i) = forceSumCoef.constTermX(i - 1) + prev_const_x + curr_const_term_x;
         prev_const_x = curr_const_term_x;
 
-        curr_const_term_y = - 0.5 * w(i) * dtheta(i) * std::sin(theta(i));
+        curr_const_term_y = 0.5 * w(i) * dtheta(i) * dtheta(i) * std::sin(theta(i));
         forceSumCoef.constTermY(i) = forceSumCoef.constTermY(i - 1) + prev_const_y + curr_const_term_y;
         prev_const_y = curr_const_term_y;
     }
