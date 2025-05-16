@@ -7,8 +7,8 @@
 namespace gen {
     constexpr double pi = 3.14159265359;
     constexpr double time_step = 0.01;
-    constexpr double num_iter = 100000;
-    constexpr double k_stop = 1000.0;
+    constexpr double num_iter = 10000;
+    constexpr double k_stop = 10000.0;
 
     void checkSVD(const Eigen::MatrixXd& A);
 }

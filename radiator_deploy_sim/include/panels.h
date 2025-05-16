@@ -19,6 +19,7 @@ namespace panels {
     inline Eigen::Vector3d r_c; 
     inline Eigen::Vector3d r_d;
     inline Eigen::Vector3d r_e;
+    inline Eigen::Vector3d r_tip;
 
     inline double I_a;
     inline double I_b;

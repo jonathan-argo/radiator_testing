@@ -26,8 +26,16 @@ int main() {
         return 1;
     }
 
-    file << "theta1,theta2,theta3,theta4,theta5,dtheta1,dtheta2,dtheta3,dtheta4,dtheta5,";
+    std::ofstream file1("../data/distances.csv");
+    if (!file1.is_open()) {
+        std::cerr << "Failed to open the file." << std::endl;
+        return 1;
+    }
+
+    file << "time,theta1,theta2,theta3,theta4,theta5,dtheta1,dtheta2,dtheta3,dtheta4,dtheta5,";
     file << "ddtheta1,ddtheta2,ddtheta3,ddtheta4,ddtheta5,Re_1x,Re_1y,Re_2x,Re_2y,Re_3x,Re_3y,Re_4x,Re_4y,Re_5x,Re_5y\n";
+
+    file1 << "time,r_ax,r_ay,r_bx,r_by,r_cx,r_cy,r_dx,r_dy,r_ex,r_ey,r_tipx,r_tipy\n";
 
     // Increased spring constants for better stability
     hinges::k_a = 0.05;
@@ -73,6 +81,9 @@ int main() {
         panels::dtheta_init5
     };
 
+    Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+    panels::calcDistances(theta);
+
     panels::forceSumCoef forceSumCoef;
     forceSumCoef = panels::calcAccCoef(state);
 
@@ -95,18 +106,33 @@ int main() {
 
     Eigen::Matrix<double, 5, 4> acceleration_buffer;
 
+    file << 0 << ",";
+    file1 << 0 << ",";
     for (int j = 0; j < state.size(); ++j) {
             file << state(j) << ",";
         }
 
-        // Write sol to CSV
-        for (int j = 0; j < sol.size(); ++j) {
-            file << sol(j);
-            if (j < sol.size() - 1) {
-                file << ",";
-            }
+    // Write sol to CSV
+    for (int j = 0; j < sol.size(); ++j) {
+        file << sol(j);
+        if (j < sol.size() - 1) {
+            file << ",";
         }
-    file << "\n";
+    }
+
+    file1 << panels::r_a.x() << ",";
+    file1 << panels::r_a.y() << ",";
+    file1 << panels::r_b.x() << ",";
+    file1 << panels::r_b.y() << ",";
+    file1 << panels::r_c.x() << ",";
+    file1 << panels::r_c.y() << ",";
+    file1 << panels::r_d.x() << ",";
+    file1 << panels::r_d.y() << ",";
+    file1 << panels::r_e.x() << ",";
+    file1 << panels::r_e.y() << ",";
+    file1 << panels::r_tip.x() << ",";
+    file1 << panels::r_tip.y();
+    file1 << "\n";
 
     Eigen::Matrix<double, 5, 1> ddtheta_n = sol.segment<5>(0);
     for (int col = 3; col > 0; --col) {
@@ -117,6 +143,24 @@ int main() {
     for (int i = 0; i < 3; ++i) {
         // std::cout << "Acceleration Buffer: \n" << acceleration_buffer << std::endl;
         state = panels::semiImplicitEuler(ddtheta_n, state);
+
+        Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+        panels::calcDistances(theta);
+
+        file1 << gen::time_step * (1 + i) << ",";
+        file1 << panels::r_a.x() << ",";
+        file1 << panels::r_a.y() << ",";
+        file1 << panels::r_b.x() << ",";
+        file1 << panels::r_b.y() << ",";
+        file1 << panels::r_c.x() << ",";
+        file1 << panels::r_c.y() << ",";
+        file1 << panels::r_d.x() << ",";
+        file1 << panels::r_d.y() << ",";
+        file1 << panels::r_e.x() << ",";
+        file1 << panels::r_e.y() << ",";
+        file1 << panels::r_tip.x() << ",";
+        file1 << panels::r_tip.y();
+        file1 << "\n";
         
         // Check for numerical instability in initial steps
         if (!isValidState(state)) {
@@ -141,6 +185,7 @@ int main() {
         }
         acceleration_buffer.col(0) = ddtheta_n;
 
+        file << gen::time_step * (1 + i) << ",";
         for (int j = 0; j < state.size(); ++j) {
             file << state(j) << ",";
         }
@@ -160,6 +205,24 @@ int main() {
     double num_iter = gen::num_iter;
     for (int i = 0; i < num_iter - 3; ++i) {
         state = panels::rk4(acceleration_buffer, state);
+
+        Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+        panels::calcDistances(theta);
+
+        file1 << gen::time_step * (4 + i) << ",";
+        file1<< panels::r_a.x() << ",";
+        file1<< panels::r_a.y() << ",";
+        file1<< panels::r_b.x() << ",";
+        file1<< panels::r_b.y() << ",";
+        file1<< panels::r_c.x() << ",";
+        file1<< panels::r_c.y() << ",";
+        file1<< panels::r_d.x() << ",";
+        file1<< panels::r_d.y() << ",";
+        file1<< panels::r_e.x() << ",";
+        file1<< panels::r_e.y() << ",";
+        file1<< panels::r_tip.x() << ",";
+        file1<< panels::r_tip.y();
+        file1 << "\n";
         
         // Check for numerical instability
         if (!isValidState(state)) {
@@ -193,6 +256,7 @@ int main() {
         }
         acceleration_buffer.col(0) = ddtheta_n;
 
+        file << gen::time_step * (4 + i) << ",";
         for (int j = 0; j < state.size(); ++j) {
             file << state(j) << ",";
         }
