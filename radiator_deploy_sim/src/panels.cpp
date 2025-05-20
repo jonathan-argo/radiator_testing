@@ -173,27 +173,6 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
         b(10 + i) += -hinges::b_damp * dtheta(i);
     }
 
-    // Mechanical stops to prevent over-rotation
-    if (theta(0) > panels::theta_max1) {
-        b(10) += -gen::k_stop * (theta(0) - panels::theta_max1);
-    } 
-
-    if ((theta(1) - theta(0)) < 0) {
-        b(11) += gen::k_stop * (theta(1) - theta(0));
-    }
-
-    if ((theta(1) - theta(2)) < 0) {
-        b(12) += gen::k_stop * (theta(1) - theta(2));
-    }
-
-    if ((theta(3) - theta(2)) < 0) {
-        b(13) += gen::k_stop * (theta(3) - theta(2));
-    }
-
-    if ((theta(3) - theta(4)) < 0) {
-        b(14) += gen::k_stop * (theta(3) - theta(4));
-    }
-
     gen::checkSVD(A);
 
     panels::SystemMatrix system;
@@ -301,3 +280,173 @@ panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 10, 1>& sta
     return forceSumCoef;
 
 }
+
+const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5, 1>& k) {
+    
+    std::ofstream file("../data/state_sol.csv");
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open the file.");
+    }
+
+    file << "time,theta1,theta2,theta3,theta4,theta5,dtheta1,dtheta2,dtheta3,dtheta4,dtheta5,";
+    file << "ddtheta1,ddtheta2,ddtheta3,ddtheta4,ddtheta5,Re_1x,Re_1y,Re_2x,Re_2y,Re_3x,Re_3y,Re_4x,Re_4y,Re_5x,Re_5y\n";
+
+    // Increased spring constants for better stability
+    hinges::k_a = k(0);
+    hinges::k_b = k(1);
+    hinges::k_c = k(2);
+    hinges::k_d = k(3);
+    hinges::k_e = k(4);
+
+
+    panels::calcMomInert();
+
+    // Moment of Inertia Debugging
+    /*
+    std::cout << "Root Moment of Inertia: " << panels::I_a << std::endl;
+    std::cout << "Panel Moment of Intertia: " << panels::I_b << std::endl;
+    */
+    Eigen::Matrix<double, 10, 1> state = {
+        panels::theta_init1,
+        panels::theta_init2,
+        panels::theta_init3,
+        panels::theta_init4,
+        panels::theta_init5,
+        panels::dtheta_init1,
+        panels::dtheta_init2,
+        panels::dtheta_init3,
+        panels::dtheta_init4,
+        panels::dtheta_init5
+    };
+
+    Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+
+    panels::forceSumCoef forceSumCoef;
+    forceSumCoef = panels::calcAccCoef(state);
+
+    /*
+    std::cout << "Acceleration Coefficients X: \n" << forceSumCoef.accCoefX << std::endl;
+    std::cout << "Acceleration Coefficients Y: \n" << forceSumCoef.accCoefY << std::endl;
+    */
+
+    panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
+
+    // sol in format: ddtheta1, ddtheta2, ddtheta3, ddtheta4, ddtheta5, Re_1x, Re_1y, Re_2x, Re_2y, Re_3x, Re_3y, Re_4x, Re_4y, Re_5x, Re_5y
+    Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+
+    // System Matrices Debugging
+    /*
+    std::cout << "A: \n" << system.A << std::endl;
+    std::cout << "b: \n" << system.b << std::endl;
+    std::cout << "Solution: \n" << sol << std::endl;
+    */
+
+    Eigen::Matrix<double, 5, 4> acceleration_buffer;
+
+    file << 0 << ",";
+    for (int j = 0; j < state.size(); ++j) {
+            file << state(j) << ",";
+        }
+
+    // Write sol to CSV
+    for (int j = 0; j < sol.size(); ++j) {
+        file << sol(j);
+        if (j < sol.size() - 1) {
+            file << ",";
+        }
+    }
+
+    Eigen::Matrix<double, 5, 1> ddtheta_n = sol.segment<5>(0);
+    for (int col = 3; col > 0; --col) {
+        acceleration_buffer.col(col) = acceleration_buffer.col(col - 1);
+    }
+    acceleration_buffer.col(0) = ddtheta_n;
+
+    for (int i = 0; i < 3; ++i) {
+        // std::cout << "Acceleration Buffer: \n" << acceleration_buffer << std::endl;
+        state = panels::semiImplicitEuler(ddtheta_n, state);
+
+        Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+        panels::calcDistances(theta);
+        
+        forceSumCoef = panels::calcAccCoef(state);
+        panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
+        Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+
+        // Check solution quality
+        double relative_error = (system.A * sol - system.b).norm() / system.b.norm();
+        if (relative_error > 1e-6) {
+            std::cerr << "Warning: Large relative error in initial system solution: " << relative_error << std::endl;
+        }
+
+        ddtheta_n << sol.segment<5>(0);
+        for (int col = 3; col > 0; --col) {
+            acceleration_buffer.col(col) = acceleration_buffer.col(col - 1);
+        }
+        acceleration_buffer.col(0) = ddtheta_n;
+
+        file << gen::time_step * (1 + i) << ",";
+        for (int j = 0; j < state.size(); ++j) {
+            file << state(j) << ",";
+        }
+
+        // Write sol to CSV
+        for (int j = 0; j < sol.size(); ++j) {
+            file << sol(j);
+            if (j < sol.size() - 1) {
+                file << ",";
+            }
+        }
+        file << "\n";
+    }
+
+    // std::cout << "Acceleration Buffer: \n" << acceleration_buffer << std::endl;
+
+    double num_iter = gen::num_iter;
+    for (int i = 0; i < num_iter - 3; ++i) {
+
+        double time = gen::time_step * (i + 4);
+
+        state = panels::rk4(acceleration_buffer, state);
+
+        Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+        
+        forceSumCoef = panels::calcAccCoef(state);
+        panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
+        Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+
+        // Check if solution is valid
+        double relative_error = (system.A * sol - system.b).norm() / system.b.norm();
+        if (relative_error > 1e-6) {
+            std::cerr << "Warning: Large relative error in system solution: " << relative_error << std::endl;
+        }
+
+        ddtheta_n << sol.segment<5>(0);
+        for (int col = 3; col > 0; --col) {
+            acceleration_buffer.col(col) = acceleration_buffer.col(col - 1);
+        }
+        acceleration_buffer.col(0) = ddtheta_n;
+
+        file << gen::time_step * (4 + i) << ",";
+        for (int j = 0; j < state.size(); ++j) {
+            file << state(j) << ",";
+        }
+
+        // Write sol to CSV
+        for (int j = 0; j < sol.size(); ++j) {
+            file << sol(j);
+            if (j < sol.size() - 1) {
+                file << ",";
+            }
+        }
+        file << "\n";
+
+        if (time >= 10) {
+            file.close();
+            return theta;
+        }
+    }
+
+    throw std::runtime_error("Failed to reach t = 10.0 in simulation");
+}
+    
