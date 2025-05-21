@@ -449,4 +449,13 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
 
     throw std::runtime_error("Failed to reach t = 10.0 in simulation");
 }
-    
+
+double panels::objective(const std::vector<double>& k_vec, std::vector<double>& /*grad*/, void* /*data*/) {
+    Eigen::VectorXd k = Eigen::Map<const Eigen::VectorXd>(k_vec.data(), k_vec.size());
+
+    Eigen::VectorXd theta_final = panels::simulate(k);
+    double err = (theta_final - gen::theta_target).squaredNorm();
+    double reg = gen::alpha * k.squaredNorm(); // optional
+
+    return err + reg;
+}
