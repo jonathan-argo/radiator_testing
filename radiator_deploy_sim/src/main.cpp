@@ -11,13 +11,13 @@
 
 int main() {
 
-    std::vector<double> k0{0.005, 0.005, 0.005, 0.005, 0.005};
+    std::vector<double> k0{0.00051, 0.0019, 0.0014, 0.0013, 0.0004};
     double minf;
 
     const int n = 5;
     nlopt::opt opt(nlopt::LN_NELDERMEAD, n);
 
-    std::vector<double> lb(n, 0.001);
+    std::vector<double> lb(n, 0.0001);
     std::vector<double> ub(n, 5);
     opt.set_lower_bounds(lb);
     opt.set_upper_bounds(ub);
@@ -31,6 +31,7 @@ int main() {
         std::cout << "Optimized stiffness values:\n";
         for (double ki : k0) std::cout << ki << " ";
         std::cout << "\nFinal cost: " << minf << "\n";
+        std::cout << "Number of Optimization Iterations: " << opt.get_numevals() << std::endl;
     } catch (std::exception& e) {
         std::cerr << "NLopt failed: " << e.what() << "\n";
     }

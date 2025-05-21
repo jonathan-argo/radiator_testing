@@ -8,8 +8,14 @@ namespace hinges {
     inline double k_d;
     inline double k_e;
 
-    constexpr double b_damp = 0.5;
-    constexpr double mu_friction = 0.0;
+    inline double prev_rad_force_a = 0;
+    inline double prev_rad_force_b = 0;
+    inline double prev_rad_force_c = 0;
+    inline double prev_rad_force_d = 0;
+    inline double prev_rad_force_e = 0;
+
+    constexpr double b_damp = 0.01;
+    constexpr double mu_friction = 0.1;
 }
 
 #endif // HINGES_H
