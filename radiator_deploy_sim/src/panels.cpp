@@ -405,6 +405,10 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
     double num_iter = gen::num_iter;
     for (int i = 0; i < num_iter - 3; ++i) {
 
+        if (i > num_iter - 4) {
+            std::cout << "\033[31m" << "Error: Number of iterations exceeded" << "\033[0m" << std::endl;
+        }
+
         double time = gen::time_step * (i + 4);
 
         state = panels::rk4(acceleration_buffer, state);
@@ -451,7 +455,7 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
 }
 
 double panels::objective(const std::vector<double>& k_vec, std::vector<double>& /*grad*/, void* /*data*/) {
-    Eigen::VectorXd k = Eigen::Map<const Eigen::VectorXd>(k_vec.data(), k_vec.size());
+    Eigen::Matrix<double, 5, 1> k = Eigen::Map<const Eigen::VectorXd>(k_vec.data(), k_vec.size());
 
     Eigen::VectorXd theta_final = panels::simulate(k);
     double err = (theta_final - gen::theta_target).squaredNorm();
