@@ -11,7 +11,7 @@
 
 int main() {
 
-    std::vector<double> k0{0.05, 0.04, 0.03, 0.02, 0.01};
+    std::vector<double> k0{0.005, 0.005, 0.005, 0.005, 0.005};
     double minf;
 
     const int n = 5;
@@ -24,7 +24,7 @@ int main() {
 
     opt.set_min_objective(panels::objective, nullptr);
     opt.set_xtol_rel(1e-4);
-    opt.set_maxeval(200);
+    opt.set_maxeval(2000);
 
     try {
         nlopt::result res = opt.optimize(k0, minf);
