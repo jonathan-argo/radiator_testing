@@ -164,9 +164,13 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     b(14) = 4 * k(4) * (gen::pi + theta(3) - theta(4)); 
 
     // Replace conditional friction with continuous friction model for all angles
+    Eigen::Matrix<double, 5, 1> radial_forces;
+    radial_forces << hinges::prev_rad_force_a, hinges::prev_rad_force_b, hinges::prev_rad_force_c, hinges::prev_rad_force_d, hinges::prev_rad_force_e;
+    // std::cout << "Coulomb Friction Terms:\n" << radial_forces * hinges::mu_friction << std::endl; 
     for (int i = 0; i < 5; ++i) {
         // Use tanh for smooth transition of friction around zero velocity
-        b(10 + i) += -hinges::mu_friction * tanh(100 * dtheta(i));
+        b(10 + i) += -hinges::mu_friction * tanh(100 * dtheta(i)) * radial_forces(i);
+        // std::cout << "b #" << i << ": " << b(10 + i) << " - " << dtheta(i) << std::endl;
     }
 
     for (int i = 0; i < 5; ++i) {
@@ -333,6 +337,11 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
 
     // sol in format: ddtheta1, ddtheta2, ddtheta3, ddtheta4, ddtheta5, Re_1x, Re_1y, Re_2x, Re_2y, Re_3x, Re_3y, Re_4x, Re_4y, Re_5x, Re_5y
     Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+    hinges::prev_rad_force_a = std::sqrt(sol(5) * sol(5) + sol(6) * sol(6));
+    hinges::prev_rad_force_b = std::sqrt(sol(7) * sol(7) + sol(8) * sol(8));
+    hinges::prev_rad_force_c = std::sqrt(sol(9) * sol(9) + sol(10) * sol(10));
+    hinges::prev_rad_force_d = std::sqrt(sol(11) * sol(11) + sol(12) * sol(12));
+    hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
 
     // System Matrices Debugging
     /*
@@ -372,6 +381,11 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
         forceSumCoef = panels::calcAccCoef(state);
         panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
         Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+        hinges::prev_rad_force_a = std::sqrt(sol(5) * sol(5) + sol(6) * sol(6));
+        hinges::prev_rad_force_b = std::sqrt(sol(7) * sol(7) + sol(8) * sol(8));
+        hinges::prev_rad_force_c = std::sqrt(sol(9) * sol(9) + sol(10) * sol(10));
+        hinges::prev_rad_force_d = std::sqrt(sol(11) * sol(11) + sol(12) * sol(12));
+        hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
 
         // Check solution quality
         double relative_error = (system.A * sol - system.b).norm() / system.b.norm();
@@ -418,6 +432,11 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
         forceSumCoef = panels::calcAccCoef(state);
         panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
         Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
+        hinges::prev_rad_force_a = std::sqrt(sol(5) * sol(5) + sol(6) * sol(6));
+        hinges::prev_rad_force_b = std::sqrt(sol(7) * sol(7) + sol(8) * sol(8));
+        hinges::prev_rad_force_c = std::sqrt(sol(9) * sol(9) + sol(10) * sol(10));
+        hinges::prev_rad_force_d = std::sqrt(sol(11) * sol(11) + sol(12) * sol(12));
+        hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
 
         // Check if solution is valid
         double relative_error = (system.A * sol - system.b).norm() / system.b.norm();
