@@ -7,15 +7,33 @@
 #include <cmath>
 #include <limits>
 #include <algorithm> // For std::clamp
+#include <nlopt.hpp>
 
 int main() {
 
-    Eigen::Matrix<double, 5, 1> k;
-    k << 0.05, 0.04, 0.03, 0.02, 0.01;
+    std::vector<double> k0{0.05, 0.04, 0.03, 0.02, 0.01};
+    double minf;
 
-    Eigen::Matrix<double, 5, 1> theta_10 = panels::simulate(k);
+    const int n = 5;
+    nlopt::opt opt(nlopt::LN_NELDERMEAD, n);
 
-    std::cout << "State at 10 seconds:\n" << theta_10 << std::endl;
-     
+    std::vector<double> lb(n, 0.001);
+    std::vector<double> ub(n, 5);
+    opt.set_lower_bounds(lb);
+    opt.set_upper_bounds(ub);
+
+    opt.set_min_objective(panels::objective, nullptr);
+    opt.set_xtol_rel(1e-4);
+    opt.set_maxeval(200);
+
+    try {
+        nlopt::result res = opt.optimize(k0, minf);
+        std::cout << "Optimized stiffness values:\n";
+        for (double ki : k0) std::cout << ki << " ";
+        std::cout << "\nFinal cost: " << minf << "\n";
+    } catch (std::exception& e) {
+        std::cerr << "NLopt failed: " << e.what() << "\n";
+    }
+
     return 0;
 }

@@ -93,7 +93,7 @@ namespace panels {
     const Eigen::Matrix<double, 10, 1> rk4(const Eigen::Matrix<double, 5, 4>& acceleration_buffer, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n);
     forceSumCoef calcAccCoef(const Eigen::Matrix<double, 10, 1>& state);
     const Eigen::Matrix<double, 5, 1> simulate(const Eigen::Matrix<double, 5, 1>& k);
-    
+    double objective(const std::vector<double>& k_vec, std::vector<double>& /*grad*/, void* /*data*/);
 }
 
 #endif // PANELS_H
