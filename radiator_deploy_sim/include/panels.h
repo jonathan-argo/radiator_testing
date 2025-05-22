@@ -87,6 +87,7 @@ namespace panels {
 // Functions
 
     void calcDistances(const Eigen::Matrix<double, 5, 1>& theta);
+    void writeDistances();
     void calcMomInert();
     SystemMatrix calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta, forceSumCoef& forceSumCoef);
     const Eigen::Matrix<double, 10, 1> semiImplicitEuler(const Eigen::Matrix<double, 5, 1>& ddtheta_n, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n);

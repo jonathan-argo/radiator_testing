@@ -364,6 +364,7 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
             file << ",";
         }
     }
+    file << "\n";
 
     Eigen::Matrix<double, 5, 1> ddtheta_n = sol.segment<5>(0);
     for (int col = 3; col > 0; --col) {
