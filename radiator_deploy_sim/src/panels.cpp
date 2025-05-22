@@ -178,30 +178,45 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
 
     // Hard Stop Dynamics: assuming linear torsional stiffness, bidirectional damping
     if (theta(0) > 0.5 * gen::pi) {
-        double T_hardstop_a1 = - hinges::k_stop * (theta(0) - 0.5 * gen::pi) - hinges::b_stop * dtheta(0); 
+        double T_hardstop_a1 = - hinges::k_stop * (theta(0) - 0.5 * gen::pi); 
+        if (dtheta(0) > 0) {
+            T_hardstop_a1 -= hinges::b_stop * dtheta(0);
+        }
         b(10) += T_hardstop_a1;
     }
 
     if (theta(0) > theta(1)) {
-        double T_hardstop_b2 = hinges::k_stop * (theta(0) - theta(1)) + hinges::b_stop * (dtheta(0) - dtheta(1));
+        double T_hardstop_b2 = hinges::k_stop * (theta(0) - theta(1));
+        if (dtheta(0) > dtheta(1)) {
+            T_hardstop_b2 += hinges::b_stop * (dtheta(0) - dtheta(1));
+        }
         b(11) += T_hardstop_b2;
         b(10) -= T_hardstop_b2;
     }
 
     if (theta(2) > theta(1)) {
-        double T_hardstop_c3 = - hinges::k_stop * (theta(2) - theta(1)) - hinges::b_stop * (dtheta(2) - dtheta(1));
+        double T_hardstop_c3 = - hinges::k_stop * (theta(2) - theta(1));
+        if (dtheta(2) > dtheta(1)) {
+            T_hardstop_c3 -= hinges::b_stop * (dtheta(2) - dtheta(1));
+        }
         b(12) += T_hardstop_c3;
         b(11) -= T_hardstop_c3;
     }
 
     if (theta(2) > theta(3)) {
-        double T_hardstop_d4 = hinges::k_stop * (theta(2) - theta(3)) + hinges::b_stop * (dtheta(2) - dtheta(4));
+        double T_hardstop_d4 = hinges::k_stop * (theta(2) - theta(3));
+        if (dtheta(2) > dtheta(3)) {
+            T_hardstop_d4 += hinges::b_stop * (dtheta(2) - dtheta(4));
+        }
         b(13) += T_hardstop_d4;
         b(12) -= T_hardstop_d4;
     }
 
     if (theta(4) > theta(3)) {
-        double T_hardstop_e5 = - hinges::k_stop * (theta(4) - theta(3)) - hinges::b_stop * (dtheta(4) - dtheta(3));
+        double T_hardstop_e5 = - hinges::k_stop * (theta(4) - theta(3));
+        if (dtheta(4) > dtheta(3)) {
+            T_hardstop_e5 -= hinges::b_stop * (dtheta(4) - dtheta(3));
+        }
         b(14) += T_hardstop_e5;
         b(13) -= T_hardstop_e5;
     }
