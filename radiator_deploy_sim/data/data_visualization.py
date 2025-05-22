@@ -10,7 +10,7 @@ df = pd.read_csv("state_sol.csv", usecols=range(6))
 
 # Define which columns are angles and lengths
 angle_cols = ['theta1', 'theta2', 'theta3', 'theta4', 'theta5']
-df = df.iloc[::10].reset_index(drop=True)
+df = df.iloc[::100].reset_index(drop=True)
 length_cols = [0.385, 0.72, 0.72, 0.72, 0.72]
 num_vectors = len(angle_cols)
 
