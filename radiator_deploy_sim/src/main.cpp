@@ -32,9 +32,13 @@ int main() {
         for (double ki : k0) std::cout << ki << " ";
         std::cout << "\nFinal cost: " << minf << "\n";
         std::cout << "Number of Optimization Iterations: " << opt.get_numevals() << std::endl;
+
+        // Eigen::Matrix<double, 5, 1> theta = panels::simulate(k0);
     } catch (std::exception& e) {
         std::cerr << "NLopt failed: " << e.what() << "\n";
     }
+
+
 
     return 0;
 }

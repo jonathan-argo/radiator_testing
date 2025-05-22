@@ -55,6 +55,8 @@
         "thread": "cpp",
         "typeinfo": "cpp",
         "core": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp"
     }
 }
