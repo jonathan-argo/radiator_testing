@@ -143,22 +143,22 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     A(10, 0) = I(0); // this is good
     A(10, 8) = w(0) * std::cos(theta(0)); // this is good
     A(10, 7) = -w(0) * std::sin(theta(0)); // this is good
-    b(10) = 4 * k(0) * ((3.0 / 2.0) * gen::pi - theta(0)) + 4 * k(1) * (0.5 * gen::pi - theta(0) + theta(1)); // this is good
+    b(10) = 4 * k(0) * ((3.0 / 2.0) * gen::pi - theta(0)) + 4 * k(1) * (gen::pi - theta(0) + theta(1)); // this is good
 
     A(11, 1) = I(1); // this is good
     A(11, 10) = w(1) * std::cos(theta(1)); // this is good
     A(11, 9) = -w(1) * std::sin(theta(1)); // this is good
-    b(11) = -4 * k(1) * (gen::pi - theta(0) + theta(1)) - 4 * k(2) * (0.5 * gen::pi + theta(1) - theta(2)); // this is good
+    b(11) = -4 * k(1) * (gen::pi - theta(0) + theta(1)) - 4 * k(2) * (gen::pi + theta(1) - theta(2)); // this is good
 
     A(12, 2) = I(2); // this is good
     A(12, 12) = w(2) * std::cos(theta(2)); // this is good
     A(12, 11) = -w(2) * std::sin(theta(2)); // this is good
-    b(12) = 4 * k(2) * (gen::pi + theta(1) - theta(2)) + 4 * k(3) * (0.5 * gen::pi - theta(2) + theta(3)); // this is good
+    b(12) = 4 * k(2) * (gen::pi + theta(1) - theta(2)) + 4 * k(3) * (gen::pi - theta(2) + theta(3)); // this is good
 
     A(13, 3) = I(3); // this is good
     A(13, 14) = w(3) * std::cos(theta(3)); // this is good
     A(13, 13) = -w(3) * std::sin(theta(3)); // this is good
-    b(13) = -4 * k(3) * (gen::pi - theta(2) + theta(3)) - 4 * k(4) * (0.5 * gen::pi + theta(3) - theta(4)); // this is good
+    b(13) = -4 * k(3) * (gen::pi - theta(2) + theta(3)) - 4 * k(4) * (gen::pi + theta(3) - theta(4)); // this is good
 
     A(14, 4) = I(4); // this is good
     b(14) = 4 * k(4) * (gen::pi + theta(3) - theta(4)); 
@@ -170,10 +170,16 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
         // Use tanh for smooth transition of friction around zero velocity
         b(10 + i) += -hinges::mu_friction * tanh(100 * dtheta(i)) * radial_forces(i);
         // std::cout << "b #" << i << ": " << b(10 + i) << " - " << dtheta(i) << std::endl;
+        if (i < 4) {
+            b(10 + i) += hinges::mu_friction * tanh(100 * dtheta(i + 1)) * radial_forces(i + 1);
+        }
     }
 
     for (int i = 0; i < 5; ++i) {
         b(10 + i) += -hinges::b_damp * dtheta(i);
+        if (i < 4) {
+            b(10 + i) += hinges::b_damp * dtheta(i + 1);
+        }
     }
 
     // Hard Stop Dynamics: assuming linear torsional stiffness, bidirectional damping
@@ -206,7 +212,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     if (theta(2) > theta(3)) {
         double T_hardstop_d4 = hinges::k_stop * (theta(2) - theta(3));
         if (dtheta(2) > dtheta(3)) {
-            T_hardstop_d4 += hinges::b_stop * (dtheta(2) - dtheta(4));
+            T_hardstop_d4 += hinges::b_stop * (dtheta(2) - dtheta(3));
         }
         b(13) += T_hardstop_d4;
         b(12) -= T_hardstop_d4;
@@ -388,11 +394,11 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
     hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
 
     // System Matrices Debugging
-    /*
+    //*
     std::cout << "A: \n" << system.A << std::endl;
     std::cout << "b: \n" << system.b << std::endl;
     std::cout << "Solution: \n" << sol << std::endl;
-    */
+    //*/
 
     Eigen::Matrix<double, 5, 4> acceleration_buffer;
 
@@ -509,7 +515,7 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
         }
         file << "\n";
 
-        if (time >= 10) {
+        if (time >= gen::sim_time) {
             file.close();
             return theta;
         }
