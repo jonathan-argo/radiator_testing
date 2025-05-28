@@ -11,7 +11,7 @@
 
 int main() {
 
-    std::vector<double> k0{0.00051, 0.0019, 0.0014, 0.0013, 0.0004};
+    std::vector<double> k0{0.00114372, 0.00347737, 0.00278589, 0.0035601, 0.000807344};
     double minf;
 
     const int n = 5;

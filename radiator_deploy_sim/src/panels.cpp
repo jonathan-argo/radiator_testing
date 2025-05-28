@@ -394,11 +394,11 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
     hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
 
     // System Matrices Debugging
-    //*
+    /*
     std::cout << "A: \n" << system.A << std::endl;
     std::cout << "b: \n" << system.b << std::endl;
     std::cout << "Solution: \n" << sol << std::endl;
-    //*/
+    */
 
     Eigen::Matrix<double, 5, 4> acceleration_buffer;
 

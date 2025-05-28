@@ -16,8 +16,8 @@ namespace hinges {
 
     constexpr double b_damp = 0.05;
     constexpr double mu_friction = 0.1;
-    constexpr double k_stop = 50;
-    constexpr double b_stop = 50; 
+    constexpr double k_stop = 10;
+    constexpr double b_stop = 10; 
 }
 
 #endif // HINGES_H
