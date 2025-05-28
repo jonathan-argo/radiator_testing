@@ -58,5 +58,6 @@
         "fstream": "cpp",
         "condition_variable": "cpp",
         "mutex": "cpp"
-    }
+    },
+    "workbench.colorTheme": "Visual Studio Light - C++"
 }

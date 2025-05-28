@@ -183,6 +183,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     }
 
     // Hard Stop Dynamics: assuming linear torsional stiffness, bidirectional damping
+    /*
     if (theta(0) > 0.5 * gen::pi) {
         double T_hardstop_a1 = - hinges::k_stop * (theta(0) - 0.5 * gen::pi); 
         if (dtheta(0) > 0) {
@@ -226,6 +227,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
         b(14) += T_hardstop_e5;
         b(13) -= T_hardstop_e5;
     }
+    */
 
     gen::checkSVD(A);
 
