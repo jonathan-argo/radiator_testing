@@ -1,0 +1,33 @@
+\documentclass[11pt]{article}
+\usepackage[paperwidth=11in, paperheight=9in, margin=1in]{geometry}
+\usepackage[T1]{fontenc}        % vector (Type 1) fonts
+\usepackage[utf8]{inputenc}     % UTF-8 input
+\usepackage{lmodern}            % Latin Modern (scalable)
+\usepackage{microtype}          % character protrusion & font expansion
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+\pdfimageresolution=600
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage[colorlinks,allcolors=blue]{hyperref}
+\usepackage{xcolor}
+\pagecolor{white}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\setlength{\arraycolsep}{5pt}
+\renewcommand{\arraystretch}{1.5}
+
+\begin{document}
+    \pagestyle{empty}
+
+    \begin{align*}
+        \tau_{hardstop-a1} &= -k(\theta_1 - \frac{\pi}{2}) - b \dot{\theta}_1 \text{, for } \theta_1 > \frac{\pi}{2} \\
+        \tau_{hardstop-b2} &= k(\theta_1 - \theta_2) + b (\dot{\theta}_1 - \dot{\theta}_2) \text{, for } \theta_1 > \theta_2 \\
+        \tau_{hardstop-c3} &= -k(\theta_3 - \theta_2) - b (\dot{\theta}_3 - \dot{\theta}_2) \text{, for } \theta_3 > \theta_2 \\
+        \tau_{hardstop-d4} &= k(\theta_3 - \theta_4) + b (\dot{\theta}_3 - \dot{\theta}_4) \text{, for } \theta_3 > \theta_4 \\
+        \tau_{hardstop-e5} &= -k(\theta_5 - \theta_4) - b (\dot{\theta}_5 - \dot{\theta}_4) \text{, for } \theta_5 > \theta_4
+    \end{align*}
+
+\end{document}

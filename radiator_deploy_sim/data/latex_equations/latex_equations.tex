@@ -1,0 +1,53 @@
+\documentclass[11pt]{article}
+% page layout
+\usepackage[letterpaper,margin=1in]{geometry}
+
+% -----------------------------------
+% VECTOR FONTS & MICROTYPING (pdfLaTeX)
+% -----------------------------------
+\usepackage[T1]{fontenc}        % vector (Type 1) fonts
+\usepackage[utf8]{inputenc}     % UTF-8 input
+\usepackage{lmodern}            % Latin Modern (scalable)
+\usepackage{microtype}          % character protrusion & font expansion
+
+% -----------------------------------
+% GRAPHICS
+% -----------------------------------
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+% tell pdfTeX to embed bitmaps at 600 dpi instead of default 72 dpi
+\pdfimageresolution=600
+
+% -----------------------------------
+% OTHER PACKAGES
+% -----------------------------------
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage[colorlinks,allcolors=blue]{hyperref}
+\usepackage{xcolor}
+\pagecolor{white}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+
+\begin{document}
+\pagestyle{empty}
+\begin{align*}
+  \Sigma F &= m_1 \vec{a}_1
+    = m_1
+    \begin{bmatrix}
+      -\ddot{\theta_1}\,\tfrac{w_1}{2}\sin(\theta_1)
+        - \tfrac{w_1}{2}\,\dot{\theta_1}^2\cos(\theta_1) \\[0.5ex]
+      \ddot{\theta_1}\,\tfrac{w_1}{2}\cos(\theta_1)
+        - \tfrac{w_1}{2}\,\dot{\theta_1}^2\sin(\theta_1)
+    \end{bmatrix}
+    = \vec{F}_{a} - \vec{F}_{b} \\[4ex]
+  \Sigma \tau_1
+    &= I_1\,\ddot{\theta_1}
+    = 4\,k_{a}\,(\frac{3\pi}{2} - \theta_1)
+      - 4\,k_{b}\,(\pi - \theta_1 + \theta_2)
+      + \vec{r}_{a \rightarrow b}\times\bigl(-\vec{F}_b)
+\end{align*}
+
+\end{document}

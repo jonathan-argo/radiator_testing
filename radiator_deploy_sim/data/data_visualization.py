@@ -46,7 +46,9 @@ def update(frame):
 
 # Animate
 ani = FuncAnimation(fig, update, frames=len(df), interval=100, blit=True)
-ani.save("radiator_deployment.gif", writer=PillowWriter(fps=10))
+ani.save("visualizations/radiator_deployment.gif", writer=PillowWriter(fps=10))
 
 # writer = FFMpegWriter(fps=10)
 # ani.save("radiator_deployment.mp4", writer=writer)
+
+print("Visualization made")
