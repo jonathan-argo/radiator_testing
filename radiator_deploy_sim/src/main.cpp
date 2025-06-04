@@ -11,17 +11,14 @@
 
 int main() {
 
-    Eigen::Matrix<double, 5, 1> k;
+    Eigen::Matrix<double, 2, 1> k;
     k << 
         0.003122977,
-        0.003122977,
-        0.003122977,
-        0.003122977,
-        0.001561489;
+        0.003122977;
 
-    Eigen::Matrix<double, 5, 1> theta = panels::simulate(k);
+    Eigen::Matrix<double, 2, 1> theta = panels::simulate(k);
 
-    std::cout << "System simulated with spring constants:\n" << k << std::endl;
+    std::cout << "System simulated with spring constants:\n" << k.transpose() << std::endl;
 
     return 0;
 }

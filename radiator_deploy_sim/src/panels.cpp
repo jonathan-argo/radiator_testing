@@ -7,7 +7,7 @@
 #include <cmath>
 
 
-void panels::calcDistances(const Eigen::Matrix<double, 5, 1>& theta) {
+void panels::calcDistances(const Eigen::Matrix<double, 2, 1>& theta) {
 
     panels::r_1 = { 
         0.5 * panels::width1 * std::cos(theta[0]),
@@ -18,24 +18,6 @@ void panels::calcDistances(const Eigen::Matrix<double, 5, 1>& theta) {
     panels::r_2 = { 
         panels::width1 * std::cos(theta[0]) + 0.5 * panels::width2 * std::cos(theta[1]),
         panels::width1 * std::sin(theta[0]) + 0.5 * panels::width2 * std::sin(theta[1]),
-        0
-    };
-        
-    panels::r_3 = {
-        panels::width1 * std::cos(theta[0]) + panels::width2 * std::cos(theta[1]) + 0.5 * panels::width3 * std::cos(theta[2]),
-        panels::width1 * std::sin(theta[0]) + panels::width2 * std::sin(theta[1]) + 0.5 * panels::width3 * std::sin(theta[2]),
-        0
-    };
-        
-    panels::r_4 = { 
-        panels::width1 * std::cos(theta[0]) + panels::width2 * std::cos(theta[1]) + panels::width3 * std::cos(theta[2]) + 0.5 * panels::width4 * std::cos(theta[3]),
-        panels::width1 * std::sin(theta[0]) + panels::width2 * std::sin(theta[1]) + panels::width3 * std::sin(theta[2]) + 0.5 * panels::width4 * std::sin(theta[3]),
-        0
-    };
-        
-    panels::r_5 = {
-        panels::width1 * std::cos(theta[0]) + panels::width2 * std::cos(theta[1]) + panels::width3 * std::cos(theta[2]) + panels::width4 * std::cos(theta[3]) + 0.5 * panels::width5 * std::cos(theta[4]),
-        panels::width1 * std::sin(theta[0]) + panels::width2 * std::sin(theta[1]) + panels::width3 * std::sin(theta[2]) + panels::width4 * std::sin(theta[3]) + 0.5 * panels::width5 * std::sin(theta[4]),
         0
     };
 
@@ -56,129 +38,93 @@ void panels::calcDistances(const Eigen::Matrix<double, 5, 1>& theta) {
         panels::width1 * std::sin(theta[0]) + panels::width2 * std::sin(theta[1]),
         0
     };
-        
-    panels::r_d = { 
-        panels::width1 * std::cos(theta[0]) + panels::width2 * std::cos(theta[1]) + panels::width3 * std::cos(theta[2]),
-        panels::width1 * std::sin(theta[0]) + panels::width2 * std::sin(theta[1]) + panels::width3 * std::sin(theta[2]),
-        0
-    };
-        
-    panels::r_e = {
-        panels::width1 * std::cos(theta[0]) + panels::width2 * std::cos(theta[1]) + panels::width3 * std::cos(theta[2]) + panels::width4 * std::cos(theta[3]),
-        panels::width1 * std::sin(theta[0]) + panels::width2 * std::sin(theta[1]) + panels::width3 * std::sin(theta[2]) + panels::width4 * std::sin(theta[3]),
-        0
-    };
-
-    panels::r_tip = {
-        panels::width1 * std::cos(theta[0]) + panels::width2 * std::cos(theta[1]) + panels::width3 * std::cos(theta[2]) + panels::width4 * std::cos(theta[3]) + panels::width5 * std::cos(theta(4)),
-        panels::width1 * std::sin(theta[0]) + panels::width2 * std::sin(theta[1]) + panels::width3 * std::sin(theta[2]) + panels::width4 * std::sin(theta[3]) + panels::width5 * std::sin(theta(4)),
-        0
-    };
 }
 
 void panels::calcMomInert() {
     panels::I_a = 0.3333 * panels::mass1 * panels::width1 * panels::width1;
     panels::I_b = 0.3333 * panels::mass2 * panels::width2 * panels::width2;
-    panels::I_c = 0.3333 * panels::mass3 * panels::width3 * panels::width3;
-    panels::I_d = 0.3333 * panels::mass4 * panels::width4 * panels::width4;
-    panels::I_e = 0.3333 * panels::mass5 * panels::width5 * panels::width5;
 }
 
-panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta, panels::forceSumCoef& forceSumCoef) {
+panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 4, 1>& theta_dtheta, panels::forceSumCoef& forceSumCoef) {
 
-    Eigen::Matrix<double, 5, 1> theta = theta_dtheta.segment<5>(0);
-    Eigen::Matrix<double, 5, 1> dtheta = theta_dtheta.segment<5>(5);
+    Eigen::Matrix<double, 2, 1> theta = theta_dtheta.segment<2>(0);
+    Eigen::Matrix<double, 2, 1> dtheta = theta_dtheta.segment<2>(2);
 
-    Eigen::Matrix<double, 5, 1> I;
-    I << panels::I_a, panels::I_b, panels::I_c, panels::I_d, panels::I_e;
+    Eigen::Matrix<double, 2, 1> I;
+    I << panels::I_a, panels::I_b;
 
-    Eigen::Matrix<double, 5, 1> m;
-    m << panels::mass1, panels::mass2, panels::mass3, panels::mass4, panels::mass5;
+    Eigen::Matrix<double, 2, 1> m;
+    m << panels::mass1, panels::mass2;
 
-    Eigen::Matrix<double, 5, 1> k;
-    k << hinges::k_a, hinges::k_b, hinges::k_c, hinges::k_d, hinges::k_e;
+    Eigen::Matrix<double, 2, 1> k;
+    k << hinges::k_a, hinges::k_b;
 
-    Eigen::Matrix<double, 5, 1> w;
-    w << panels::width1, panels::width2, panels::width3, panels::width4, panels::width5;
+    Eigen::Matrix<double, 2, 1> w;
+    w << panels::width1, panels::width2;
 
 
-    // A for state variable:: ddtheta1, ddtheta2, ddtheta3, ddtheta4, ddtheta5, Re_1x, Re_1y, Re_2x, Re_2y, Re_3x, Re_3y, Re_4x, Re_4y, Re_5x, Re_5y
-    Eigen::Matrix<double, 15, 15> A;
+    // A for state variable:: ddtheta1, ddtheta2, Re_1x, Re_1y, Re_2x, Re_2y
+    Eigen::Matrix<double, 6, 6> A;
     A.setZero();
 
-    Eigen::Matrix<double, 15, 1> b;
+    Eigen::Matrix<double, 6, 1> b;
     b.setZero();
 
     // Sum Forces x
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 2; ++i) {
         for (int j = 0; j <= i; ++j) {
             A(i, j) = m(j) * forceSumCoef.accCoefX(i, j);
         }
-        if (i < 4) {
-            A(i, (2 * i + 7)) = 1;
+        if (i < 1) {
+            A(i, (2 * i + 4)) = 1;
         }
-        A(i, (2 * i + 5)) = -1;
+        A(i, (2 * i + 2)) = -1;
     }
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 2; ++i) {
         b(i) = m(i) * forceSumCoef.constTermX(i);
     }
 
     // Sum Forces y
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 2; ++i) {
         for (int j = 0; j <= i; ++j) {
-            A(i + 5, j) = m(j) * forceSumCoef.accCoefY(i, j);
+            A(i + 2, j) = m(j) * forceSumCoef.accCoefY(i, j);
         }
-        if (i < 4) {
-            A(i + 5, (2 * i + 8)) = 1;
+        if (i < 1) {
+            A(i + 2, (2 * i + 5)) = 1;
         }
-        A(i + 5, (2 * i + 6)) = -1;
+        A(i + 2, (2 * i + 3)) = -1;
     }
 
-    for (int i = 0; i < 5; ++i) {
-        b(i + 5) = m(i) * forceSumCoef.constTermY(i);
+    for (int i = 0; i < 2; ++i) {
+        b(i + 2) = m(i) * forceSumCoef.constTermY(i);
     }
 
     // Sum Moments
-    A(10, 0) = I(0); // this is good
-    A(10, 8) = w(0) * std::cos(theta(0)); // this is good
-    A(10, 7) = -w(0) * std::sin(theta(0)); // this is good
-    b(10) = 4 * k(0) * ((3.0 / 2.0) * gen::pi - theta(0)) + 4 * k(1) * (gen::pi - theta(0) + theta(1)); // this is good
+    A(4, 0) = I(0); // this is good
+    A(4, 5) = w(0) * std::cos(theta(0)); // this is good
+    A(4, 4) = -w(0) * std::sin(theta(0)); // this is good
+    b(4) = 4 * k(0) * ((3.0 / 2.0) * gen::pi - theta(0)) + 4 * k(1) * (gen::pi - theta(0) + theta(1)); // this is good
 
-    A(11, 1) = I(1); // this is good
-    A(11, 10) = w(1) * std::cos(theta(1)); // this is good
-    A(11, 9) = -w(1) * std::sin(theta(1)); // this is good
-    b(11) = -4 * k(1) * (gen::pi - theta(0) + theta(1)) - 4 * k(2) * (gen::pi + theta(1) - theta(2)); // this is good
+    A(5, 1) = I(1); // this is good
+    b(5) = -4 * k(1) * (gen::pi - theta(0) + theta(1)); // this is good
 
-    A(12, 2) = I(2); // this is good
-    A(12, 12) = w(2) * std::cos(theta(2)); // this is good
-    A(12, 11) = -w(2) * std::sin(theta(2)); // this is good
-    b(12) = 4 * k(2) * (gen::pi + theta(1) - theta(2)) + 4 * k(3) * (gen::pi - theta(2) + theta(3)); // this is good
-
-    A(13, 3) = I(3); // this is good
-    A(13, 14) = w(3) * std::cos(theta(3)); // this is good
-    A(13, 13) = -w(3) * std::sin(theta(3)); // this is good
-    b(13) = -4 * k(3) * (gen::pi - theta(2) + theta(3)) - 4 * k(4) * (gen::pi + theta(3) - theta(4)); // this is good
-
-    A(14, 4) = I(4); // this is good
-    b(14) = 4 * k(4) * (gen::pi + theta(3) - theta(4)); 
-
-    Eigen::Matrix<double, 5, 1> radial_forces;
-    radial_forces << hinges::prev_rad_force_a, hinges::prev_rad_force_b, hinges::prev_rad_force_c, hinges::prev_rad_force_d, hinges::prev_rad_force_e;
+    Eigen::Matrix<double, 2, 1> radial_forces;
+    radial_forces << hinges::prev_rad_force_a, hinges::prev_rad_force_b;
     // std::cout << "Coulomb Friction Terms:\n" << radial_forces * hinges::mu_friction << std::endl; 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 2; ++i) {
         // Use tanh for smooth transition of friction around zero velocity
-        b(10 + i) += -hinges::mu_friction * tanh(100 * dtheta(i)) * radial_forces(i);
+        b(4 + i) += -hinges::mu_friction * tanh(100 * dtheta(i)) * radial_forces(i);
         // std::cout << "b #" << i << ": " << b(10 + i) << " - " << dtheta(i) << std::endl;
-        if (i < 4) {
-            b(10 + i) += hinges::mu_friction * tanh(100 * dtheta(i + 1)) * radial_forces(i + 1);
+        if (i < 1) {
+            b(4 + i) += hinges::mu_friction * tanh(100 * dtheta(i + 1)) * radial_forces(i + 1);
         }
     }
 
-    for (int i = 0; i < 5; ++i) {
-        b(10 + i) += -hinges::b_damp * dtheta(i);
-        if (i < 4) {
-            b(10 + i) += hinges::b_damp * dtheta(i + 1);
+    for (int i = 0; i < 2; ++i) {
+        b(4 + i) += -hinges::b_damp * dtheta(i);
+        if (i < 1) {
+            b(4 + i) += hinges::b_damp * dtheta(i + 1);
         }
     }
 
@@ -188,7 +134,7 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
         if (dtheta(0) > 0) {
             T_hardstop_a1 -= hinges::b_stop * dtheta(0);
         }
-        b(10) += T_hardstop_a1;
+        b(4) += T_hardstop_a1;
     }
 
     if (theta(0) > theta(1)) {
@@ -196,35 +142,8 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
         if (dtheta(0) > dtheta(1)) {
             T_hardstop_b2 += hinges::b_stop * (dtheta(0) - dtheta(1));
         }
-        b(11) += T_hardstop_b2;
-        b(10) -= T_hardstop_b2;
-    }
-
-    if (theta(2) > theta(1)) {
-        double T_hardstop_c3 = - hinges::k_stop * (theta(2) - theta(1));
-        if (dtheta(2) > dtheta(1)) {
-            T_hardstop_c3 -= hinges::b_stop * (dtheta(2) - dtheta(1));
-        }
-        b(12) += T_hardstop_c3;
-        b(11) -= T_hardstop_c3;
-    }
-
-    if (theta(2) > theta(3)) {
-        double T_hardstop_d4 = hinges::k_stop * (theta(2) - theta(3));
-        if (dtheta(2) > dtheta(3)) {
-            T_hardstop_d4 += hinges::b_stop * (dtheta(2) - dtheta(3));
-        }
-        b(13) += T_hardstop_d4;
-        b(12) -= T_hardstop_d4;
-    }
-
-    if (theta(4) > theta(3)) {
-        double T_hardstop_e5 = - hinges::k_stop * (theta(4) - theta(3));
-        if (dtheta(4) > dtheta(3)) {
-            T_hardstop_e5 -= hinges::b_stop * (dtheta(4) - dtheta(3));
-        }
-        b(14) += T_hardstop_e5;
-        b(13) -= T_hardstop_e5;
+        b(5) += T_hardstop_b2;
+        b(4) -= T_hardstop_b2;
     }
 
     gen::checkSVD(A);
@@ -238,17 +157,17 @@ panels::SystemMatrix panels::calcAccAndReac(const Eigen::Matrix<double, 10, 1>& 
     
 }
 
-const Eigen::Matrix<double, 10, 1> panels::rk4(const Eigen::Matrix<double, 5, 4>& acceleration_buffer, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n) {
-    Eigen::Matrix<double, 10, 1> state_n_1;
+const Eigen::Matrix<double, 4, 1> panels::rk4(const Eigen::Matrix<double, 2, 4>& acceleration_buffer, const Eigen::Matrix<double, 4, 1>& theta_dtheta_n) {
+    Eigen::Matrix<double, 4, 1> state_n_1;
     double dt = gen::time_step;
     
-    Eigen::Matrix<double, 5, 1> theta = theta_dtheta_n.segment<5>(0);
-    Eigen::Matrix<double, 5, 1> dtheta = theta_dtheta_n.segment<5>(5);
+    Eigen::Matrix<double, 2, 1> theta = theta_dtheta_n.segment<2>(0);
+    Eigen::Matrix<double, 2, 1> dtheta = theta_dtheta_n.segment<2>(2);
 
-    Eigen::Matrix<double, 5, 1> k1, k2, k3, k4;
-    Eigen::Matrix<double, 5, 1> l1, l2, l3, l4;
+    Eigen::Matrix<double, 2, 1> k1, k2, k3, k4;
+    Eigen::Matrix<double, 2, 1> l1, l2, l3, l4;
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 2; ++i) {
         k1(i) = dt * dtheta(i);
         l1(i) = dt * acceleration_buffer(i, 0);
         k2(i) = dt * (dtheta(i) + 0.5 * l1(i));
@@ -259,39 +178,39 @@ const Eigen::Matrix<double, 10, 1> panels::rk4(const Eigen::Matrix<double, 5, 4>
         l4(i) = dt * acceleration_buffer(i, 3);
     }
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 2; ++i) {
         state_n_1(i) = theta(i) + 0.16667 * (k1(i) + 2 * k2(i) + 2 * k3(i) + k4(i));
-        state_n_1(i + 5) = dtheta(i) + 0.16667 * (l1(i) + 2 * l2(i) + 2 * l3(i) + l4(i));
+        state_n_1(i + 2) = dtheta(i) + 0.16667 * (l1(i) + 2 * l2(i) + 2 * l3(i) + l4(i));
     }
 
     return state_n_1;
 
 }
 
-const Eigen::Matrix<double, 10, 1> panels::semiImplicitEuler(const Eigen::Matrix<double, 5, 1>& ddtheta_n, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n) {
-    Eigen::Matrix<double, 5, 1> theta = theta_dtheta_n.segment<5>(0);
-    Eigen::Matrix<double, 5, 1> dtheta = theta_dtheta_n.segment<5>(5);
+const Eigen::Matrix<double, 4, 1> panels::semiImplicitEuler(const Eigen::Matrix<double, 2, 1>& ddtheta_n, const Eigen::Matrix<double, 4, 1>& theta_dtheta_n) {
+    Eigen::Matrix<double, 2, 1> theta = theta_dtheta_n.segment<2>(0);
+    Eigen::Matrix<double, 2, 1> dtheta = theta_dtheta_n.segment<2>(2);
     double dt = gen::time_step;
 
-    Eigen::Matrix<double, 10, 1> theta_dtheta_n_1;
+    Eigen::Matrix<double, 4, 1> theta_dtheta_n_1;
 
-    for (int i = 0; i < 5; ++i) {
-        theta_dtheta_n_1(i + 5) = dtheta(i) + dt * ddtheta_n(i);
-        theta_dtheta_n_1(i) = theta(i) + dt * theta_dtheta_n_1(i + 5);
+    for (int i = 0; i < 2; ++i) {
+        theta_dtheta_n_1(i + 2) = dtheta(i) + dt * ddtheta_n(i);
+        theta_dtheta_n_1(i) = theta(i) + dt * theta_dtheta_n_1(i + 2);
     }
 
     return theta_dtheta_n_1;
 }
 
-panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 10, 1>& state) {
-    Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
-    Eigen::Matrix<double, 5, 1> dtheta = state.segment<5>(5);
+panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 4, 1>& state) {
+    Eigen::Matrix<double, 2, 1> theta = state.segment<2>(0);
+    Eigen::Matrix<double, 2, 1> dtheta = state.segment<2>(2);
 
-    Eigen::Matrix<double, 5, 1> w;
-    w << panels::width1, panels::width2, panels::width3, panels::width4, panels::width5;
+    Eigen::Matrix<double, 2, 1> w;
+    w << panels::width1, panels::width2;
 
-    Eigen::Matrix<double, 5, 1> m;
-    m << panels::mass1, panels::mass2, panels::mass3, panels::mass4, panels::mass5;
+    Eigen::Matrix<double, 2, 1> m;
+    m << panels::mass1, panels::mass2;
 
     panels::forceSumCoef forceSumCoef;
     forceSumCoef.accCoefX.setZero();
@@ -313,7 +232,7 @@ panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 10, 1>& sta
     double prev_const_x = curr_const_term_x;
     double prev_const_y = curr_const_term_y;
 
-    for (int i = 1; i < 5; ++i) {
+    for (int i = 1; i < 2; ++i) {
         forceSumCoef.accCoefX.row(i) = forceSumCoef.accCoefX.row(i - 1);
         forceSumCoef.accCoefX(i, i - 1) = 2 * forceSumCoef.accCoefX(i, i - 1);
         forceSumCoef.accCoefX(i, i) = 0.5 * w(i) * (-std::sin(theta(i))); // yeah these are correct
@@ -335,22 +254,19 @@ panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 10, 1>& sta
 
 }
 
-const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5, 1>& k) {
+const Eigen::Matrix<double, 2, 1> panels::simulate(const Eigen::Matrix<double, 2, 1>& k) {
     
     std::ofstream file("../data/state_sol.csv");
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open the file.");
     }
 
-    file << "time,theta1,theta2,theta3,theta4,theta5,dtheta1,dtheta2,dtheta3,dtheta4,dtheta5,";
-    file << "ddtheta1,ddtheta2,ddtheta3,ddtheta4,ddtheta5,Re_1x,Re_1y,Re_2x,Re_2y,Re_3x,Re_3y,Re_4x,Re_4y,Re_5x,Re_5y\n";
+    file << "time,theta1,theta2,dtheta1,dtheta2,";
+    file << "ddtheta1,ddtheta2,Re_1x,Re_1y,Re_2x,Re_2y\n";
 
     // Increased spring constants for better stability
     hinges::k_a = k(0);
     hinges::k_b = k(1);
-    hinges::k_c = k(2);
-    hinges::k_d = k(3);
-    hinges::k_e = k(4);
 
 
     panels::calcMomInert();
@@ -360,20 +276,14 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
     std::cout << "Root Moment of Inertia: " << panels::I_a << std::endl;
     std::cout << "Panel Moment of Intertia: " << panels::I_b << std::endl;
     */
-    Eigen::Matrix<double, 10, 1> state = {
+    Eigen::Matrix<double, 4, 1> state = {
         panels::theta_init1,
         panels::theta_init2,
-        panels::theta_init3,
-        panels::theta_init4,
-        panels::theta_init5,
         panels::dtheta_init1,
-        panels::dtheta_init2,
-        panels::dtheta_init3,
-        panels::dtheta_init4,
-        panels::dtheta_init5
+        panels::dtheta_init2
     };
 
-    Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+    Eigen::Matrix<double, 2, 1> theta = state.segment<2>(0);
 
     panels::forceSumCoef forceSumCoef;
     forceSumCoef = panels::calcAccCoef(state);
@@ -385,13 +295,10 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
 
     panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
 
-    // sol in format: ddtheta1, ddtheta2, ddtheta3, ddtheta4, ddtheta5, Re_1x, Re_1y, Re_2x, Re_2y, Re_3x, Re_3y, Re_4x, Re_4y, Re_5x, Re_5y
+    // sol in format: ddtheta1, ddtheta2, Re_1x, Re_1y, Re_2x, Re_2y
     Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
-    hinges::prev_rad_force_a = std::sqrt(sol(5) * sol(5) + sol(6) * sol(6));
-    hinges::prev_rad_force_b = std::sqrt(sol(7) * sol(7) + sol(8) * sol(8));
-    hinges::prev_rad_force_c = std::sqrt(sol(9) * sol(9) + sol(10) * sol(10));
-    hinges::prev_rad_force_d = std::sqrt(sol(11) * sol(11) + sol(12) * sol(12));
-    hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
+    hinges::prev_rad_force_a = std::sqrt(sol(2) * sol(2) + sol(3) * sol(3));
+    hinges::prev_rad_force_b = std::sqrt(sol(4) * sol(4) + sol(5) * sol(5));
 
     // System Matrices Debugging
     //*
@@ -400,7 +307,7 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
     std::cout << "Solution: \n" << sol << std::endl;
     //*/
 
-    Eigen::Matrix<double, 5, 4> acceleration_buffer;
+    Eigen::Matrix<double, 2, 4> acceleration_buffer;
 
     file << 0 << ",";
     for (int j = 0; j < state.size(); ++j) {
@@ -416,7 +323,7 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
     }
     file << "\n";
 
-    Eigen::Matrix<double, 5, 1> ddtheta_n = sol.segment<5>(0);
+    Eigen::Matrix<double, 2, 1> ddtheta_n = sol.segment<2>(0);
     for (int col = 3; col > 0; --col) {
         acceleration_buffer.col(col) = acceleration_buffer.col(col - 1);
     }
@@ -426,17 +333,14 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
         // std::cout << "Acceleration Buffer: \n" << acceleration_buffer << std::endl;
         state = panels::semiImplicitEuler(ddtheta_n, state);
 
-        Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+        Eigen::Matrix<double, 2, 1> theta = state.segment<2>(0);
         panels::calcDistances(theta);
         
         forceSumCoef = panels::calcAccCoef(state);
         panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
         Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
-        hinges::prev_rad_force_a = std::sqrt(sol(5) * sol(5) + sol(6) * sol(6));
-        hinges::prev_rad_force_b = std::sqrt(sol(7) * sol(7) + sol(8) * sol(8));
-        hinges::prev_rad_force_c = std::sqrt(sol(9) * sol(9) + sol(10) * sol(10));
-        hinges::prev_rad_force_d = std::sqrt(sol(11) * sol(11) + sol(12) * sol(12));
-        hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
+        hinges::prev_rad_force_a = std::sqrt(sol(2) * sol(2) + sol(3) * sol(3));
+        hinges::prev_rad_force_b = std::sqrt(sol(4) * sol(4) + sol(5) * sol(5));
 
         // Check solution quality
         double relative_error = (system.A * sol - system.b).norm() / system.b.norm();
@@ -444,7 +348,7 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
             std::cerr << "Warning: Large relative error in initial system solution: " << relative_error << std::endl;
         }
 
-        ddtheta_n << sol.segment<5>(0);
+        ddtheta_n << sol.segment<2>(0);
         for (int col = 3; col > 0; --col) {
             acceleration_buffer.col(col) = acceleration_buffer.col(col - 1);
         }
@@ -478,16 +382,13 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
 
         state = panels::rk4(acceleration_buffer, state);
 
-        Eigen::Matrix<double, 5, 1> theta = state.segment<5>(0);
+        Eigen::Matrix<double, 2, 1> theta = state.segment<2>(0);
         
         forceSumCoef = panels::calcAccCoef(state);
         panels::SystemMatrix system = panels::calcAccAndReac(state, forceSumCoef);
         Eigen::VectorXd sol = system.A.fullPivLu().solve(system.b);
-        hinges::prev_rad_force_a = std::sqrt(sol(5) * sol(5) + sol(6) * sol(6));
-        hinges::prev_rad_force_b = std::sqrt(sol(7) * sol(7) + sol(8) * sol(8));
-        hinges::prev_rad_force_c = std::sqrt(sol(9) * sol(9) + sol(10) * sol(10));
-        hinges::prev_rad_force_d = std::sqrt(sol(11) * sol(11) + sol(12) * sol(12));
-        hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
+        hinges::prev_rad_force_a = std::sqrt(sol(2) * sol(2) + sol(3) * sol(3));
+        hinges::prev_rad_force_b = std::sqrt(sol(4) * sol(4) + sol(5) * sol(5));
 
         // Check if solution is valid
         double relative_error = (system.A * sol - system.b).norm() / system.b.norm();
@@ -495,7 +396,7 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
             std::cerr << "Warning: Large relative error in system solution: " << relative_error << std::endl;
         }
 
-        ddtheta_n << sol.segment<5>(0);
+        ddtheta_n << sol.segment<2>(0);
         for (int col = 3; col > 0; --col) {
             acceleration_buffer.col(col) = acceleration_buffer.col(col - 1);
         }
@@ -525,7 +426,7 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
 }
 
 double panels::objective(const std::vector<double>& k_vec, std::vector<double>& /*grad*/, void* /*data*/) {
-    Eigen::Matrix<double, 5, 1> k = Eigen::Map<const Eigen::VectorXd>(k_vec.data(), k_vec.size());
+    Eigen::Matrix<double, 2, 1> k = Eigen::Map<const Eigen::VectorXd>(k_vec.data(), k_vec.size());
 
     Eigen::VectorXd theta_final = panels::simulate(k);
     double err = (theta_final - gen::theta_target).squaredNorm();

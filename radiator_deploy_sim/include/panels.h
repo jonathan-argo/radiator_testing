@@ -45,55 +45,37 @@ namespace panels {
     constexpr double theta_init2 = gen::pi - 0.01; // [rad]
     constexpr double dtheta_init2 = -0.01; // [rad/s]
 
-    // Panel 3
-    constexpr double width3 = 0.720; // [m]
-    constexpr double mass3 = 0.782; // [kg]
-    constexpr double theta_init3 = 0.01; // [rad]
-    constexpr double dtheta_init3 = 0.01; // [rad/s]
+    const Eigen::Matrix<double, 2, 1> theta_init = (Eigen::Matrix<double, 2, 1>() << 
+                theta_init1, theta_init2).finished();
 
-    // Panel 4
-    constexpr double width4 = 0.720; // [m]
-    constexpr double mass4 = 0.782; // [kg]
-    constexpr double theta_init4 = gen::pi - 0.01; // [rad]
-    constexpr double dtheta_init4 = -0.01; // [rad/s]
-
-    // Panel 5
-    constexpr double width5 = 0.720; // [m]
-    constexpr double mass5 = 0.782; // [kg]
-    constexpr double theta_init5 = 0.01; // [rad]
-    constexpr double dtheta_init5 = 0.01; // [rad/s]
-
-    const Eigen::Matrix<double, 5, 1> theta_init = (Eigen::Matrix<double, 5, 1>() << 
-                theta_init1, theta_init2, theta_init3, theta_init4, theta_init5).finished();
-
-    const Eigen::Matrix<double, 10, 1> init = (Eigen::Matrix<double, 10, 1>() << 
-                theta_init1, theta_init2, theta_init3, theta_init4, theta_init5, 
-                dtheta_init1, dtheta_init2, dtheta_init3, dtheta_init4, dtheta_init5).finished();
+    const Eigen::Matrix<double, 4, 1> init = (Eigen::Matrix<double, 4, 1>() << 
+                theta_init1, theta_init2, 
+                dtheta_init1, dtheta_init2).finished();
 
 
 
     struct SystemMatrix {
-        Eigen::Matrix<double, 15, 15> A;
-        Eigen::Matrix<double, 15, 1> b;
+        Eigen::Matrix<double, 6, 6> A;
+        Eigen::Matrix<double, 6, 1> b;
     };
 
     struct forceSumCoef {
-        Eigen::Matrix<double, 5, 5> accCoefX;
-        Eigen::Matrix<double, 5, 5> accCoefY;
-        Eigen::Matrix<double, 5, 1> constTermX;
-        Eigen::Matrix<double, 5, 1> constTermY;
+        Eigen::Matrix<double, 2, 2> accCoefX;
+        Eigen::Matrix<double, 2, 2> accCoefY;
+        Eigen::Matrix<double, 2, 1> constTermX;
+        Eigen::Matrix<double, 2, 1> constTermY;
     };
 
 // Functions
 
-    void calcDistances(const Eigen::Matrix<double, 5, 1>& theta);
+    void calcDistances(const Eigen::Matrix<double, 2, 1>& theta);
     void writeDistances();
     void calcMomInert();
-    SystemMatrix calcAccAndReac(const Eigen::Matrix<double, 10, 1>& theta_dtheta, forceSumCoef& forceSumCoef);
-    const Eigen::Matrix<double, 10, 1> semiImplicitEuler(const Eigen::Matrix<double, 5, 1>& ddtheta_n, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n);
-    const Eigen::Matrix<double, 10, 1> rk4(const Eigen::Matrix<double, 5, 4>& acceleration_buffer, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n);
-    forceSumCoef calcAccCoef(const Eigen::Matrix<double, 10, 1>& state);
-    const Eigen::Matrix<double, 5, 1> simulate(const Eigen::Matrix<double, 5, 1>& k);
+    SystemMatrix calcAccAndReac(const Eigen::Matrix<double, 4, 1>& theta_dtheta, forceSumCoef& forceSumCoef);
+    const Eigen::Matrix<double, 4, 1> semiImplicitEuler(const Eigen::Matrix<double, 2, 1>& ddtheta_n, const Eigen::Matrix<double, 4, 1>& theta_dtheta_n);
+    const Eigen::Matrix<double, 4, 1> rk4(const Eigen::Matrix<double, 2, 4>& acceleration_buffer, const Eigen::Matrix<double, 4, 1>& theta_dtheta_n);
+    forceSumCoef calcAccCoef(const Eigen::Matrix<double, 4, 1>& state);
+    const Eigen::Matrix<double, 2, 1> simulate(const Eigen::Matrix<double, 2, 1>& k);
     double objective(const std::vector<double>& k_vec, std::vector<double>& /*grad*/, void* /*data*/);
 }
 

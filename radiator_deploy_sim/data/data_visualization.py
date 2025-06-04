@@ -5,13 +5,13 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.animation import FFMpegWriter
 
 # Load and downsample
-df = pd.read_csv("state_sol.csv", usecols=range(6))
+df = pd.read_csv("state_sol.csv", usecols=range(3))
 
 
 # Define which columns are angles and lengths
-angle_cols = ['theta1', 'theta2', 'theta3', 'theta4', 'theta5']
+angle_cols = ['theta1', 'theta2']
 df = df.iloc[::100].reset_index(drop=True)
-length_cols = [0.385, 0.72, 0.72, 0.72, 0.72]
+length_cols = [0.385, 0.72]
 num_vectors = len(angle_cols)
 
 # Set up the figure
