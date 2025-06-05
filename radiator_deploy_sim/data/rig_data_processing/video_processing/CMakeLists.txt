@@ -19,4 +19,6 @@ add_executable(process_video ${SOURCES})
 # ===== Link OpenCV =====
 target_link_libraries(process_video ${OpenCV_LIBS})
 
-target_compile_definitions(process_video PRIVATE GENERATE_MARKERS)
+# ===== Compile Definitions =====
+# target_compile_definitions(process_video PRIVATE GENERATE_MARKERS)
+target_compile_definitions(process_video PRIVATE SQUARE_VIDEO)

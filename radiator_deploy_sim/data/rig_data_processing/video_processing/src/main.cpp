@@ -23,35 +23,81 @@ int main() {
         }
     #endif
 
-    cv::VideoCapture inputVideo;
-    inputVideo.open("/home/jonathanvollrath/radiator_testing/radiator_deploy_sim/data/test_video.mp4");
+    #ifdef SQUARE_VIDEO
+        cv::VideoCapture cap("/home/jonathanvollrath/radiator_testing/radiator_deploy_sim/data/test_video.mp4");
+        if (!cap.isOpened()) {
+            std::cerr << "Could not open video file.\n";
+            return -1;
+        }
 
-    if (!inputVideo.isOpened()) {
-        std::cerr << "Could not open the video file." << std::endl;
-        return -1;
-    }
+        cv::VideoWriter writer;
+        int codec = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
+        double fps = cap.get(cv::CAP_PROP_FPS);
+        cv::Size outputSize(500, 500); // this will need to be updated for the size of the video file that the visualization spits out
 
-    cv::aruco::DetectorParameters detectorParams = cv::aruco::DetectorParameters();
-    cv::aruco::ArucoDetector detector(dictionary, detectorParams);
+        writer.open("/home/jonathanvollrath/radiator_testing/radiator_deploy_sim/data/test_output.mp4", codec, fps, outputSize, true);
+        if (!writer.isOpened()) {
+            std::cerr << "Failed to open video writer.\n";
+            return -1;
+        }
 
-    const int waitTime = 30; // milliseconds between frames
+        // ArUco dictionary and detector
+        cv::aruco::DetectorParameters detectorParams;
+        cv::aruco::ArucoDetector detector(dictionary, detectorParams);
 
-    while (inputVideo.grab()) {
-        cv::Mat image, imageCopy;
-        inputVideo.retrieve(image);
-        image.copyTo(imageCopy);
+        // Target size of the rectified image
+        int outputWidth = 500, outputHeight = 500;
 
-        std::vector<int> ids;
-        std::vector<std::vector<cv::Point2f>> corners, rejected;
-        detector.detectMarkers(image, corners, ids, rejected);
+        while (true) {
+            cv::Mat frame;
+            cap >> frame;
+            if (frame.empty()) break;
 
-        if (!ids.empty())
-            cv::aruco::drawDetectedMarkers(imageCopy, corners, ids);
+            std::vector<int> ids;
+            std::vector<std::vector<cv::Point2f>> corners, rejected;
+            detector.detectMarkers(frame, corners, ids, rejected);
 
-        cv::imshow("out", imageCopy);
-        char key = (char) cv::waitKey(waitTime);
-        if (key == 27) // ESC
-            break;
-    }
+            if (ids.size() >= 4) {
+                std::map<int, cv::Point2f> markerCenters;
+
+                for (size_t i = 0; i < ids.size(); ++i) {
+                    if (ids[i] >= 0 && ids[i] <= 3) { // Only use markers 0,1,2,3
+                        cv::Point2f center(0, 0);
+                        for (const auto& pt : corners[i])
+                            center += pt;
+                        center *= 0.25f;
+                        markerCenters[ids[i]] = center;
+                    }
+                }
+
+                if (markerCenters.size() == 4) {
+                    std::vector<cv::Point2f> src = {
+                        markerCenters[0],
+                        markerCenters[1],
+                        markerCenters[3],
+                        markerCenters[2]
+                    };
+                    std::vector<cv::Point2f> dst = {
+                        {0.0f, 0.0f},
+                        {(float)outputWidth, 0.0f},
+                        {(float)outputWidth, (float)outputHeight},
+                        {0.0f, (float)outputHeight}
+                    };
+
+                    cv::Mat H = cv::getPerspectiveTransform(src, dst);
+                    cv::Mat warped;
+                    cv::warpPerspective(frame, warped, H, cv::Size(outputWidth, outputHeight));
+
+                    writer.write(warped); 
+                    cv::imshow("Warped", warped);
+                }
+            }
+
+            cv::imshow("Original", frame);
+            char key = (char) cv::waitKey(30);
+            if (key == 27) break; // ESC to quit
+        }
+    #endif
+
     return 0;
 }
