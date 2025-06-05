@@ -1,9 +1,8 @@
 CMakeFiles/process_video.dir/src/main.cpp.o: \
  /home/jonathanvollrath/radiator_testing/radiator_deploy_sim/data/rig_data_processing/video_processing/src/main.cpp \
  /usr/include/stdc-predef.h \
- /home/jonathanvollrath/libraries/opencv_contrib/modules/aruco/include/opencv2/aruco.hpp \
- /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/aruco_detector.hpp \
- /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/aruco_dictionary.hpp \
+ /home/jonathanvollrath/libraries/opencv/include/opencv2/opencv.hpp \
+ /home/jonathanvollrath/libraries/opencv/build/opencv2/opencv_modules.hpp \
  /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core.hpp \
  /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/cvdef.h \
  /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/version.hpp \
@@ -68,7 +67,6 @@ CMakeFiles/process_video.dir/src/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/c++/13/bits/std_abs.h \
  /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/base.hpp \
- /home/jonathanvollrath/libraries/opencv/build/opencv2/opencv_modules.hpp \
  /usr/include/c++/13/climits \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h \
@@ -265,7 +263,111 @@ CMakeFiles/process_video.dir/src/main.cpp.o: \
  /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/optim.hpp \
  /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/ovx.hpp \
  /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/cvdef.h \
- /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/aruco_board.hpp \
- /home/jonathanvollrath/libraries/opencv_contrib/modules/aruco/include/opencv2/aruco/aruco_calib.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/calib3d/include/opencv2/calib3d.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/features2d/include/opencv2/features2d.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/miniflann.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/defines.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/config.h \
+ /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/affine.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/utils/logger.hpp \
+ /usr/include/c++/13/iostream \
+ /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/utils/logger.defines.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/utils/logtag.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/dnn/include/opencv2/dnn.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/dnn/include/opencv2/dnn/dnn.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/async.hpp \
+ /usr/include/c++/13/chrono \
+ /home/jonathanvollrath/libraries/opencv/modules/dnn/include/opencv2/dnn/version.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/dnn/include/opencv2/dnn/dict.hpp \
+ /usr/include/c++/13/map /usr/include/c++/13/bits/stl_tree.h \
+ /usr/include/c++/13/bits/stl_map.h \
+ /usr/include/c++/13/bits/stl_multimap.h \
+ /home/jonathanvollrath/libraries/opencv/modules/dnn/include/opencv2/dnn/layer.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/dnn/include/opencv2/dnn/dnn.inl.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/dnn/include/opencv2/dnn/utils/inference_engine.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/dnn/include/opencv2/dnn/dnn.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/flann_base.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/general.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/matrix.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/params.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/any.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/defines.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/saving.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/nn_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/result_set.h \
+ /usr/include/c++/13/set /usr/include/c++/13/bits/stl_set.h \
+ /usr/include/c++/13/bits/stl_multiset.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/all_indices.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/kdtree_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/dynamic_bitset.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/dist.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/heap.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/allocator.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/random.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/kdtree_single_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/kmeans_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/logger.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/composite_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/linear_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/hierarchical_clustering_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/lsh_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/lsh_table.h \
+ /usr/include/c++/13/iomanip /usr/include/c++/13/locale \
+ /usr/include/c++/13/bits/locale_facets_nonio.h \
+ /usr/include/x86_64-linux-gnu/c++/13/bits/time_members.h \
+ /usr/include/x86_64-linux-gnu/c++/13/bits/messages_members.h \
+ /usr/include/libintl.h /usr/include/c++/13/bits/codecvt.h \
+ /usr/include/c++/13/bits/locale_facets_nonio.tcc \
+ /usr/include/c++/13/bits/locale_conv.h \
+ /usr/include/c++/13/bits/quoted_string.h /usr/include/c++/13/math.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/autotuned_index.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/ground_truth.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/index_testing.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/timer.h \
+ /home/jonathanvollrath/libraries/opencv/modules/flann/include/opencv2/flann/sampling.h \
+ /home/jonathanvollrath/libraries/opencv/modules/highgui/include/opencv2/highgui.hpp \
  /home/jonathanvollrath/libraries/opencv/modules/imgcodecs/include/opencv2/imgcodecs.hpp \
- /usr/include/c++/13/iostream
+ /home/jonathanvollrath/libraries/opencv/modules/videoio/include/opencv2/videoio.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/imgproc/include/opencv2/imgproc.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/imgproc/include/opencv2/imgproc/segmentation.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/ml/include/opencv2/ml.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/ml/include/opencv2/ml/ml.inl.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/aruco_detector.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/aruco_dictionary.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/aruco_board.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/graphical_code_detector.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/detection_based_tracker.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/face.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/charuco_detector.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/objdetect/include/opencv2/objdetect/barcode.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/photo/include/opencv2/photo.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/warpers.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/warpers.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/cuda.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/cuda_types.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/core/include/opencv2/core/cuda.inl.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/warpers_inl.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/warpers.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/matchers.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/motion_estimators.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/matchers.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/util.hpp \
+ /usr/include/c++/13/list /usr/include/c++/13/bits/stl_list.h \
+ /usr/include/c++/13/bits/list.tcc \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/util_inl.hpp \
+ /usr/include/c++/13/queue /usr/include/c++/13/deque \
+ /usr/include/c++/13/bits/stl_deque.h /usr/include/c++/13/bits/deque.tcc \
+ /usr/include/c++/13/bits/stl_queue.h \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/camera.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/exposure_compensate.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/seam_finders.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/blenders.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/stitching/include/opencv2/stitching/detail/camera.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/video/include/opencv2/video.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/video/include/opencv2/video/tracking.hpp \
+ /home/jonathanvollrath/libraries/opencv/modules/video/include/opencv2/video/background_segm.hpp \
+ /home/jonathanvollrath/libraries/opencv_contrib/modules/aruco/include/opencv2/aruco.hpp \
+ /home/jonathanvollrath/libraries/opencv_contrib/modules/aruco/include/opencv2/aruco/aruco_calib.hpp

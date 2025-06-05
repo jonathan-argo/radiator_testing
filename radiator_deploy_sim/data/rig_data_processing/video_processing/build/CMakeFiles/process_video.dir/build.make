@@ -103,6 +103,7 @@ process_video: /home/jonathanvollrath/libraries/opencv/build/lib/libopencv_dnn_o
 process_video: /home/jonathanvollrath/libraries/opencv/build/lib/libopencv_dnn_superres.so.4.10.0
 process_video: /home/jonathanvollrath/libraries/opencv/build/lib/libopencv_dpm.so.4.10.0
 process_video: /home/jonathanvollrath/libraries/opencv/build/lib/libopencv_face.so.4.10.0
+process_video: /home/jonathanvollrath/libraries/opencv/build/lib/libopencv_freetype.so.4.10.0
 process_video: /home/jonathanvollrath/libraries/opencv/build/lib/libopencv_fuzzy.so.4.10.0
 process_video: /home/jonathanvollrath/libraries/opencv/build/lib/libopencv_hfs.so.4.10.0
 process_video: /home/jonathanvollrath/libraries/opencv/build/lib/libopencv_img_hash.so.4.10.0
