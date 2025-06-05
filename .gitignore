@@ -9,3 +9,4 @@ radiator_deploy_sim/build/*
 !radiator_deploy_sim/build/.gitkeep
 *.csv
 venv/
+radiator_deploy_sim/data/rig_data_processing/venv/
