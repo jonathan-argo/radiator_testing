@@ -18,6 +18,10 @@ namespace hinges {
     constexpr double mu_friction = 0.1;
     constexpr double k_stop = 50;
     constexpr double b_stop = 50; 
+
+    constexpr double k_uncertainty = 0.1; 
+    constexpr double mu_uncertainty = 0.2;
+    constexpr double b_uncertainty = 0.2;
 }
 
 #endif // HINGES_H

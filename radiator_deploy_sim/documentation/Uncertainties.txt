@@ -1,0 +1,15 @@
+Sources of Uncertainty:
+    - Springs Constants:
+        - Torsional Stiffness: Lee Springs tests to +- 10% at max torque, though in linear regime, should apply to torsional stiffness
+            - Original approx for torsional stiffness comes from Shigley, checked against example that Shigley has
+        - Spring Relaxation: Lee Springs has no data on it, it seems like the maximum we can expect over the course of a year is about 30%, though in extreme cases, this can be more if, for example, lots of temp fluctuations, but for model correclation 
+    
+    - Coulomb Friction Constants:
+        - This one is a bit tough to get actual data on, I've been quoted something in the realm of +- 0.05, so we can run with that, but this is just worth testing
+
+    - Damping (Viscous) Constants:
+        - Another really tough one, not a whole bunch of publication on it, could be that it just doesn't exist, but again worth testing, I wouldn't be shocked if it was on the order of +- 100% or even more because of the tolerance in the housing and shaft 
+
+
+I'm honestly a bit worried about all the constants just being different for each hinge, so might have to up the model to include that bit, but the main issue is that we would have to test each hinge, which is NOT what we want to do
+    - Though we could just literally plug and chug until it matches, it would be slightly annoying, but way better than trying to actually define the constants for each hinge

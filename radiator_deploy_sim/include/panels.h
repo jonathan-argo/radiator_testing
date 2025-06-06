@@ -7,6 +7,7 @@
 #include <limits>
 #include <algorithm> // For std::clamp
 #include <fstream>
+#include <bitset>
 
 namespace panels {
 
@@ -93,8 +94,7 @@ namespace panels {
     const Eigen::Matrix<double, 10, 1> semiImplicitEuler(const Eigen::Matrix<double, 5, 1>& ddtheta_n, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n);
     const Eigen::Matrix<double, 10, 1> rk4(const Eigen::Matrix<double, 5, 4>& acceleration_buffer, const Eigen::Matrix<double, 10, 1>& theta_dtheta_n);
     forceSumCoef calcAccCoef(const Eigen::Matrix<double, 10, 1>& state);
-    const Eigen::Matrix<double, 5, 1> simulate(const Eigen::Matrix<double, 5, 1>& k);
-    double objective(const std::vector<double>& k_vec, std::vector<double>& /*grad*/, void* /*data*/);
+    const Eigen::Matrix<double, 5, 1> simulate(const Eigen::Matrix<double, 5, 1>& k, std::bitset<6>& sim_id, std::ofstream& file);
 }
 
 #endif // PANELS_H

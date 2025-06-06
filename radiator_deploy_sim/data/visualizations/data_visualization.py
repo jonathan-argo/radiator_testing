@@ -5,7 +5,7 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.animation import FFMpegWriter
 
 # Load and downsample
-df = pd.read_csv("../state_sol.csv", usecols=range(6))
+df = pd.read_csv("../state_sol.csv", usecols=range(7))
 
 
 # Define which columns are angles and lengths

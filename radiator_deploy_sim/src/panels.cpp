@@ -335,15 +335,7 @@ panels::forceSumCoef panels::calcAccCoef(const Eigen::Matrix<double, 10, 1>& sta
 
 }
 
-const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5, 1>& k) {
-    
-    std::ofstream file("../data/state_sol.csv");
-    if (!file.is_open()) {
-        throw std::runtime_error("Failed to open the file.");
-    }
-
-    file << "time,theta1,theta2,theta3,theta4,theta5,dtheta1,dtheta2,dtheta3,dtheta4,dtheta5,";
-    file << "ddtheta1,ddtheta2,ddtheta3,ddtheta4,ddtheta5,Re_1x,Re_1y,Re_2x,Re_2y,Re_3x,Re_3y,Re_4x,Re_4y,Re_5x,Re_5y\n";
+const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5, 1>& k, std::bitset<6>& sim_id, std::ofstream& file) {
 
     // Increased spring constants for better stability
     hinges::k_a = k(0);
@@ -394,13 +386,15 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
     hinges::prev_rad_force_e = std::sqrt(sol(13) * sol(13) + sol(14) * sol(14));
 
     // System Matrices Debugging
-    //*
+    /*
     std::cout << "A: \n" << system.A << std::endl;
     std::cout << "b: \n" << system.b << std::endl;
     std::cout << "Solution: \n" << sol << std::endl;
-    //*/
+    */
 
     Eigen::Matrix<double, 5, 4> acceleration_buffer;
+
+    file << sim_id << ",";
 
     file << 0 << ",";
     for (int j = 0; j < state.size(); ++j) {
@@ -449,6 +443,8 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
             acceleration_buffer.col(col) = acceleration_buffer.col(col - 1);
         }
         acceleration_buffer.col(0) = ddtheta_n;
+
+        file << sim_id << ",";
 
         file << gen::time_step * (1 + i) << ",";
         for (int j = 0; j < state.size(); ++j) {
@@ -501,6 +497,8 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
         }
         acceleration_buffer.col(0) = ddtheta_n;
 
+        file << sim_id << ",";
+
         file << gen::time_step * (4 + i) << ",";
         for (int j = 0; j < state.size(); ++j) {
             file << state(j) << ",";
@@ -516,20 +514,9 @@ const Eigen::Matrix<double, 5, 1> panels::simulate(const Eigen::Matrix<double, 5
         file << "\n";
 
         if (time >= gen::sim_time) {
-            file.close();
             return theta;
         }
     }
 
     throw std::runtime_error("Failed to reach t = 10.0 in simulation");
-}
-
-double panels::objective(const std::vector<double>& k_vec, std::vector<double>& /*grad*/, void* /*data*/) {
-    Eigen::Matrix<double, 5, 1> k = Eigen::Map<const Eigen::VectorXd>(k_vec.data(), k_vec.size());
-
-    Eigen::VectorXd theta_final = panels::simulate(k);
-    double err = (theta_final - gen::theta_target).squaredNorm();
-    double reg = gen::alpha * k.squaredNorm(); // optional
-
-    return err + reg;
 }
